@@ -102,7 +102,6 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - frontend
       - backend
     networks:
       - app-network
