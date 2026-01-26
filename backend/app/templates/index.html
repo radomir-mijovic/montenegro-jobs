@@ -1,0 +1,167 @@
+{% extends "base.html" %} {% block title %} Poslici.me {% endblock %} {% block
+content %}
+<!-- Banner Section Three-->
+<section class="banner-section-three at-home18">
+  <div class="auto-container">
+    <div class="row align-items-center">
+      <div class="content-column col-lg-7">
+        <div class="inner-column">
+          <div class="title-box wow fadeInUp">
+            <h3>Nalazimo najbolje poslove za Vas</h3>
+            <div class="text">
+              Najnaprednija platforma za zapošljavanje u Crnoj Gori — svi
+              poslovi na jednom mjestu.
+              <br>
+              Pronađite svoju karijernu priliku među {{total}} poslova.
+            </div>
+          </div>
+          <!-- Job Search Form -->
+          <div class="job-search-form-two wow fadeInUp" data-wow-delay="200ms">
+            <form method="get" action="/job-search">
+              <div class="row">
+                <div class="form-group col-lg-5 col-md-12 col-sm-12">
+                  <label class="title">Pozicija</label>
+                  <span class="icon flaticon-search-1"></span>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder="Naziv posla, ključne reči ili kompanija"
+                  />
+                </div>
+                <!-- Form Group -->
+                <div class="form-group col-lg-4 col-md-12 col-sm-12 location">
+                  <label class="title">Gdje</label>
+                  <span class="icon flaticon-map-locator"></span>
+                  <input type="text" name="city" placeholder="Grad" />
+                </div>
+                <!-- Form Group -->
+                <div class="form-group col-lg-3 col-md-12 col-sm-12 btn-box">
+                  <button type="submit" class="theme-btn btn-style-one">
+                    <span class="btn-title">Pronađi posao</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- Job Search Form -->
+          <!-- Popular Search -->
+          <div
+            class="popular-searches at-home18 mb-5 wow fadeInUp"
+            data-wow-delay="400ms"
+          >
+            <span class="title">Popularne pretrage : </span>
+            <span class="dark-color">Direktor</span>,
+            <span class="dark-color">Kobobar/ica</span>,
+            <span class="dark-color">Dizajner</span>,
+            <span class="dark-color">Prodavac</span>,
+            <span class="dark-color">Nadzorni organ</span>,
+            <span class="dark-color">Vodoinstalater</span>,
+            <span class="dark-color">Elektricar</span>
+          </div>
+          <!-- End Popular Search -->
+          <!--Candidate Section-->
+          <div
+            class="bottom-box d-flex align-items-center justify-content-between wow fadeInUp"
+            data-wow-delay="1500ms"
+          >
+            <div class="count-employers d-flex align-items-center">
+              <span class="title mr20 fz16 fw500"
+                >1k+ Zapošljenih ljudi. Roditelji odahnuli!</span
+              >
+              <img src="{{ url_for('static', path='images/resource/multi-peoples.png') }}" alt="" />
+            </div>
+          </div>
+          <!-- End Candidate Section-->
+        </div>
+      </div>
+      <div class="image-column col-lg-4 offset-lg-1">
+        <!-- Job Block -->
+        <div class="job-block mr-30 ml30 mb30 mt30">
+          <div class="inner-box">
+            <div class="content">
+              <span class="company-logo"
+                ><img class="rounded-circle w50" src="{{jobs[0].img}}" alt=""
+              /></span>
+              <h4><a href="{{jobs[0].url}}">{{jobs[0].title}}</a></h4>
+              <ul class="job-info">
+                <li>
+                  <span class="icon flaticon-briefcase"></span
+                  >{{jobs[0].company}}
+                </li>
+                <li>
+                  <span class="icon flaticon-map-locator"></span>
+                  {{jobs[0].location}}
+                </li>
+              </ul>
+              <ul class="job-other-info">
+                <li class="required">{{jobs[0].source}}</li>
+                <li class="time">{{jobs[0].expires}}</li>
+              </ul>
+              <button class="bookmark-btn">
+                <span class="flaticon-bookmark"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Job Block -->
+        <div class="job-block mb30">
+          <div class="inner-box">
+            <div class="content">
+              <span class="company-logo"
+                ><img class="rounded-circle w50" src="{{jobs[1].img}}" alt=""
+              /></span>
+              <h4><a href="{{jobs[1].url}}">{{jobs[1].title}}</a></h4>
+              <ul class="job-info">
+                <li>
+                  <span class="icon flaticon-briefcase"></span>
+                  {{jobs[1].company}}
+                </li>
+                <li>
+                  <span class="icon flaticon-map-locator"></span>
+                  {{jobs[1].location}}
+                </li>
+              </ul>
+              <ul class="job-other-info">
+                <li class="required">{{jobs[1].source}}</li>
+                <li class="time">{{jobs[1].expires}}</li>
+              </ul>
+              <button class="bookmark-btn">
+                <span class="flaticon-bookmark"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Job Block -->
+        <div class="job-block mr-30 ml30">
+          <div class="inner-box">
+            <div class="content">
+              <span class="company-logo"
+                ><img class="rounded-circle w50" src="{{jobs[2].img}}" alt=""
+              /></span>
+              <h4><a href="{{jobs[2].url}}}">{{jobs[2].title}}</a></h4>
+              <ul class="job-info">
+                <li>
+                  <span class="icon flaticon-briefcase"></span>
+                  {{jobs[2].company}}
+                </li>
+                <li>
+                  <span class="icon flaticon-map-locator"></span>
+                  {{jobs[2].location}}
+                </li>
+              </ul>
+              <ul class="job-other-info">
+                <li class="required">{{jobs[2].source}}</li>
+                <li class="time">{{jobs[2].expires}}</li>
+              </ul>
+              <button class="bookmark-btn">
+                <span class="flaticon-bookmark"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% include "partials/featured-cities.html" %} {% include
+"partials/featured-jobs.html" %} {% endblock %}

@@ -3,6 +3,8 @@ from typing import List
 
 from bs4 import BeautifulSoup
 
+from app.scrapers.utils import convert_date
+
 from .base import BaseScraper, Job
 
 logger = logging.getLogger(__name__)
@@ -18,7 +20,9 @@ class PrekoVeze(BaseScraper):
     def _parse_listing(self, html: str) -> List[Job]:
         jobs: List = []
         soup = BeautifulSoup(html, "html.parser")
-        job_cards = soup.find_all("section", class_="job featured featured-primary mb-md")
+        job_cards = soup.find_all(
+            "section", class_="job featured featured-primary mb-md"
+        )
 
         for card in job_cards:
             try:
@@ -43,15 +47,21 @@ class PrekoVeze(BaseScraper):
         items = card.find("p")
         location = items.contents[0].strip() if items else "N/A"
         company = items.find("strong").get_text(strip=True) if items else "N/A"
-        expires = items.find("span", class_="text-muted").get_text(strip=True) if items else "N/A"
-        
+        expires = (
+            items.find("span", class_="text-muted").get_text(strip=True)
+            if items
+            else "N/A"
+        )
+        expires_str = expires.replace("Važi do: ", "")
+        expires_date_object = convert_date(expires_str)
 
         return Job(
             title=title,
             company=company,
             url=url,
             location=location,
-            expires=expires,
+            date_posted=None,
+            expires=expires_date_object,
             source="prekoveze.me",
             img=img,
         )

@@ -1,7 +1,35 @@
+import logging
+from contextlib import asynccontextmanager
+
+from app.db import init_db
+from app.routers import pages
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-app = FastAPI(title="Montenegro Jobs API")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting application")
+    logger.info("Initializing database")
+    init_db()
+    logger.info("Database initialized successfully")
+    yield
+    logger.info("Shutting down application...")
+
+
+app = FastAPI(title="Montenegro Jobs", lifespan=lifespan)
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+
+app.include_router(pages.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -11,9 +39,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     return {"message": "Welcome to Montenegro Jobs API"}
+
 
 @app.get("/api/health")
 async def health_check():

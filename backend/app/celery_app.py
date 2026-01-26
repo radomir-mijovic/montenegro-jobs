@@ -1,7 +1,6 @@
 import os
 
 from celery import Celery
-from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,6 +23,11 @@ celery_app.conf.update(
     task_soft_time_limit=25 * 60,
 )
 
-celery_app.conf.beat_schedule = {}
+celery_app.conf.beat_schedule = {
+    "scrape-jobs-every-minute": {
+        "task": "app.tasks.scrape_all_jobs",
+        "schedule": 600.0,
+    }
+}
 
 celery_app.autodiscover_tasks(["app.tasks"])

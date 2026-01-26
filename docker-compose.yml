@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -41,7 +39,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend/app:/code/app
+      - ./backend:/code
     environment:
       - PYTHONUNBUFFERED=1
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/montenegro_jobs
@@ -61,7 +59,7 @@ services:
     container_name: montenegro-jobs-celery-worker
     command: celery -A app.celery_app worker --loglevel=info
     volumes:
-      - ./backend/app:/code/app
+      - ./backend:/code
     environment:
       - PYTHONUNBUFFERED=1
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/montenegro_jobs
@@ -81,7 +79,7 @@ services:
     container_name: montenegro-jobs-celery-beat
     command: celery -A app.celery_app beat --loglevel=info
     volumes:
-      - ./backend/app:/code/app
+      - ./backend:/code
     environment:
       - PYTHONUNBUFFERED=1
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/montenegro_jobs

@@ -1,0 +1,33 @@
+{% for job in jobs %}
+<div class="job-block col-lg-6 col-md-12 col-sm-12">
+  <div class="inner-box">
+    <div class="content">
+      <span class="company-logo"><img src="{{job.img}}" alt="" /></span>
+      <h4>
+        <a href="{{job.url}}">{{ job.title }}</a>
+      </h4>
+      <ul class="job-info">
+        <li>
+          <span class="icon flaticon-briefcase"></span> {{ job.company }}
+        </li>
+        <li>
+          <span class="icon flaticon-map-locator"></span> {{ job.location }}
+        </li>
+      </ul>
+      <ul class="job-other-info">
+        {% if job.date_posted %}
+        <li class="time">{{ job.date_posted }}</li>
+        {% endif %}
+        <li class="privacy">{{ job.expires }}</li>
+        <li class="required">{{ job.source }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% if not has_more %}
+<script>
+  document.querySelector('.show-more')?.remove();
+</script>
+{% endif %}

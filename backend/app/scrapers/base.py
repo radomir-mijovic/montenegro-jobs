@@ -1,7 +1,8 @@
+from datetime import date
 import logging
 import time
+from pydantic import BaseModel
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import List
 
 import requests
@@ -9,17 +10,15 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class Job:
+class Job(BaseModel):
     title: str
     company: str
     location: str
-    url: str | None = None
-    salary: str | None = None
-    source: str | None = None
-    date_posted: str | None = None
-    expires: str | None = None
-    img: str | None = None
+    url: str
+    source: str
+    date_posted: date | None
+    expires: date
+    img: str
 
 
 class BaseScraper(ABC):
@@ -62,7 +61,7 @@ class BaseScraper(ABC):
         jobs = []
 
         for page in range(max_pages):
-            logger.info(f"Scraping jobs for {page}")
+            logger.info(f"Scraping jobs for {self}")
             url = self._build_url(page)
             html = self._fetch_page(url)
 

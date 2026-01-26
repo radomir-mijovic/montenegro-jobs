@@ -1,0 +1,89 @@
+<section class="features-section">
+  <div class="auto-container">
+    <div class="sec-title">
+      <h2>Popularni Gradovi</h2>
+      <div class="text">
+        Lorem ipsum dolor sit amet elit, sed do eiusmod tempor
+      </div>
+    </div>
+
+    <div class="row wow fadeInUp">
+      <div class="column col-lg-4 col-md-6 col-sm-12">
+        <!-- Feature Block -->
+        <div class="feature-block">
+          <div class="inner-box">
+            <figure class="image"><img src="{{url_for('static', path=cities[0].image)}}" alt=""></figure>
+            <div class="overlay-box">
+              <div class="content">
+                <h5>{{cities[0].title}}</h5>
+                <span class="total-jobs">{{cities[0].total_jobs}} Jobs</span>
+                <a href="/job-search?city={{cities[0].title}}" class="overlay-link"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column col-lg-4 col-md-6 col-sm-12">
+        <!-- Feature Block -->
+        <div class="feature-block">
+          <div class="inner-box">
+            <figure class="image"><img src="{{url_for('static', path=cities[1].image)}}" alt=""></figure>
+            <div class="overlay-box">
+              <div class="content">
+                <h5>{{cities[1].title}}</h5>
+                <span class="total-jobs">{{cities[1].total_jobs}} Jobs</span>
+                <a href="/job-search?city={{cities[1].title}}" class="overlay-link"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Block -->
+        <div class="feature-block">
+          <div class="inner-box">
+            <figure class="image"><img src="{{url_for('static', path=cities[2].image)}}" alt=""></figure>
+            <div class="overlay-box">
+              <div class="content">
+                <h5>{{cities[2].title}}</h5>
+                <span class="total-jobs">{{cities[2].total_jobs}} Jobs</span>
+                <a href="/job-search?city={{cities[2].title}}" class="overlay-link"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="column col-lg-4 col-md-6 col-sm-12">
+
+        <!-- Feature Block -->
+        <div class="feature-block">
+          <div class="inner-box">
+            <figure class="image"><img src="{{url_for('static', path=cities[3].image)}}" alt=""></figure>
+            <div class="overlay-box">
+              <div class="content">
+                <h5>{{cities[3].title}}</h5>
+                <span class="total-jobs">{{cities[3].total_jobs}} Jobs</span>
+                <a href="/job-search?city={{cities[3].title}}" class="overlay-link"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Block -->
+        <div class="feature-block">
+          <div class="inner-box">
+            <figure class="image"><img src="{{url_for('static', path=cities[4].image)}}" alt=""></figure>
+            <div class="overlay-box">
+              <div class="content">
+                <h5>{{cities[4].title}}</h5>
+                <span class="total-jobs">{{cities[4].total_jobs}} Jobs</span>
+                <a href="/job-search?city={{cities[4].title}}" class="overlay-link"></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

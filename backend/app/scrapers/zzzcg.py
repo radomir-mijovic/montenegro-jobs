@@ -3,6 +3,8 @@ from typing import List
 
 from bs4 import BeautifulSoup
 
+from app.scrapers.utils import convert_date
+
 from .base import BaseScraper, Job, requests
 
 logger = logging.getLogger(__name__)
@@ -43,20 +45,28 @@ class ZzzCg(BaseScraper):
         items = card.find_all("li", class_="elementor-icon-list-item")
         company = items[0].get_text(strip=True) if items else "N/A"
         location = items[1].get_text(strip=True) if items else "N/A"
-        date_posted = items[2].get_text(strip=True) if items else "N/A"
+        date_posted = items[2].get_text(strip=True) if items else None
+
+        if date_posted:
+            date_posted_object = convert_date(date_posted)
+        else:
+            date_posted_object = None
 
         detail_html = requests.get(url).text
         detail_soup = BeautifulSoup(detail_html, "html.parser")
 
         expires_elem = detail_soup.select_one("div.rokzaprijavu")
         expires = expires_elem.get_text(strip=True) if expires_elem else "N/A"
+        expires_str = expires.replace("Važi do:", "")
+        expires_date_object = convert_date(expires_str)
 
         return Job(
             title=title,
             company=company,
             location=location,
             url=url,
-            date_posted=date_posted,
-            expires=expires,
+            date_posted=date_posted_object,
+            expires=expires_date_object,
             source="zzzcg.me",
+            img="",
         )

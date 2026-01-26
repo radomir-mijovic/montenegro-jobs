@@ -1,0 +1,92 @@
+{% extends "base.html" %} {% block content %}
+<section class="page-title style-two">
+  <div class="auto-container">
+    <!-- Job Search Form -->
+    <div class="job-search-form">
+      <form
+        hx-get="/job-query"
+        hx-target="#job-result"
+        hx-trigger="keyup delay:300ms from:input, submit{% if has_search %}, load{% endif %}"
+      >
+        <div class="row">
+          <!-- Form Group -->
+          <div class="form-group col-lg-5 col-md-12 col-sm-12">
+            <span class="icon flaticon-search-1"></span>
+            <input
+              type="text"
+              name="title"
+              value="{{ title }}"
+              placeholder="Job title, keywords, or company"
+            />
+          </div>
+
+          <!-- Form Group -->
+          <div class="form-group col-lg-4 col-md-12 col-sm-12 location">
+            <span class="icon flaticon-map-locator"></span>
+            <input
+              type="text"
+              name="city"
+              value="{{ city }}"
+              placeholder="City or postcode"
+            />
+          </div>
+
+          <!-- Form Group -->
+          <div class="form-group col-lg-3 col-md-12 col-sm-12 text-right">
+            <button type="submit" class="theme-btn btn-style-one">
+              Find Jobs
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <!-- Job Search Form -->
+  </div>
+</section>
+<!--End Page Title-->
+
+<!-- Listing Section -->
+<section class="ls-section">
+  <div class="auto-container">
+    <div class="filters-backdrop"></div>
+
+    <div class="row">
+      <!-- Content Column -->
+      <div class="content-column col-lg-12">
+        <div class="ls-outer">
+          <!-- ls Switcher -->
+
+          <div class="row" id="job-result">
+            {% include "partials/job-result.html" %}
+          </div>
+
+          <nav class="ls-pagination">
+            <div class="ls-show-more">
+              <p>Showing <span id="job-count">{{ jobs|length }}</span> Jobs</p>
+              <div class="bar">
+                <span class="bar-inner" style="width: 40%"></span>
+              </div>
+              <button
+                class="show-more"
+                hx-get="/job-query"
+                hx-target="#job-result"
+                hx-swap="beforeend"
+                hx-vals='js:{offset: parseInt(document.querySelector(".show-more").dataset.offset), limit: 10}'
+                data-offset="{{ jobs|length }}"
+                onclick="
+                  this.dataset.offset = parseInt(this.dataset.offset) + 10;
+                  document.getElementById('job-count').textContent =
+                    parseInt(document.getElementById('job-count').textContent) +
+                    10;
+                "
+              >
+                Show More
+              </button>
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

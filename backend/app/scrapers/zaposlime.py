@@ -1,8 +1,10 @@
 import logging
 from typing import List
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
+
+from app.scrapers.utils import convert_date
 
 from .base import BaseScraper, Job
 
@@ -47,22 +49,28 @@ class ZaposliMe(BaseScraper):
         img = card.find("img", class_="rounded img-4by3-lg")["src"]
 
         items = card.find_all("li", class_="list-inline-item")
-        date_posted = items[0].get_text(strip=True) if items else "N/A"
         location = items[1].get_text(strip=True) if items else "N/A"
+        date_posted = items[0].get_text(strip=True) if items else None
+
+        if date_posted:
+            date_posted_object = convert_date(date_posted)
+        else:
+            date_posted_object = None
 
         detail_html = requests.get(url).text
         detail_soup = BeautifulSoup(detail_html, "html.parser")
 
-        expires_elem = detail_soup.find('span', class_='ms-4').find_next('span')
+        expires_elem = detail_soup.find("span", class_="ms-4").find_next("span")
         expires = expires_elem.get_text(strip=True)
+        expires_date_object = convert_date(expires)
 
         return Job(
             title=title,
             company=company,
             url=url,
             location=location,
-            date_posted=date_posted,
-            expires="Važi do:" + expires,
+            date_posted=date_posted_object,
+            expires=expires_date_object,
             source="zaposli.me",
             img=img,
         )
