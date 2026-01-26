@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://posaohub.me/sitemap.xml
+
+# Crawl-delay for all bots
+Crawl-delay: 1

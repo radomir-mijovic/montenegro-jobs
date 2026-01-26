@@ -3,6 +3,33 @@
   <head>
     <title>{% block title %}{% endblock %}</title>
     <meta charset="utf-8" />
+    <meta name="description" content="{% block description %}Pronađite posao u Crnoj Gori. Najnaprednija platforma za zapošljavanje - svi poslovi na jednom mjestu. Budva, Podgorica, Tivat, Herceg Novi.{% endblock %}" />
+    <meta name="keywords" content="posao crna gora, poslovi montenegro, zaposlenje, budva poslovi, podgorica poslovi, tivat poslovi" />
+    <meta name="author" content="PosaoHub" />
+
+    <!-- Open Graph Meta Tags for Social Media -->
+    <meta property="og:title" content="{% block og_title %}PosaoHub - Poslovi u Crnoj Gori{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}Pronađite posao u Crnoj Gori. Sve oglase na jednom mjestu.{% endblock %}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://posaohub.me{{ request.url.path }}" />
+    <meta property="og:locale" content="sr_ME" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{% block twitter_title %}PosaoHub - Poslovi u Crnoj Gori{% endblock %}" />
+    <meta name="twitter:description" content="{% block twitter_description %}Pronađite posao u Crnoj Gori{% endblock %}" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://posaohub.me{{ request.url.path }}" />
+
+    <!-- Language and Region -->
+    <link rel="alternate" hreflang="sr-ME" href="https://posaohub.me{{ request.url.path }}" />
+    <link rel="alternate" hreflang="sr" href="https://posaohub.me{{ request.url.path }}" />
+    <link rel="alternate" hreflang="x-default" href="https://posaohub.me{{ request.url.path }}" />
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
 
     <!-- Stylesheets -->
@@ -83,7 +110,7 @@
       <!-- Preloader -->
       <div class="preloader"></div>
       <!-- Main Header-->
-      <header class="main-header">
+      <header class="main-header" role="banner">
         <!-- Main box -->
         <div class="main-box">
           <!--Nav Outer -->
@@ -136,9 +163,11 @@
         <div id="nav-mobile"></div>
       </header>
 
-      {% block content %}{% endblock %}
+      <main role="main" id="main-content">
+        {% block content %}{% endblock %}
+      </main>
 
-      <footer class="main-footer style-five">
+      <footer class="main-footer style-five" role="contentinfo">
         <!--Widgets Section-->
         <div class="widgets-section">
           <div class="auto-container">

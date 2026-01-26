@@ -11,9 +11,9 @@ from sqlmodel import select
 logger = logging.getLogger(__name__)
 
 SOURCES: dict[str, int] = {
-    "prekoveze": 1,
-    "zaposlime": 2,
-    "zzzcg": 1,
+    "prekoveze": 5,
+    "zaposlime": 5,
+    "zzzcg": 5,
 }
 
 

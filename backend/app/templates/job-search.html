@@ -1,4 +1,50 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+
+{% block title %}Pretraga Poslova u Crnoj Gori | PosaoHub{% endblock %}
+
+{% block description %}Pretražite preko hiljadu poslova u Crnoj Gori. Filtrirajte po gradu, poziciji i kompaniji. Pronađite savršen posao za vas.{% endblock %}
+
+{% block content %}
+
+<!-- JSON-LD Structured Data for Job Postings -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Poslovi u Crnoj Gori",
+  "description": "Lista aktivnih poslova u Crnoj Gori",
+  "numberOfItems": {{ jobs|length }},
+  "itemListElement": [
+    {% for job in jobs %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "item": {
+        "@type": "JobPosting",
+        "title": "{{ job.title }}",
+        "description": "{{ job.title }} - {{ job.company }}",
+        "datePosted": "{{ job.created_at.isoformat() if job.created_at else '' }}",
+        "validThrough": "{{ job.expires if job.expires else '' }}",
+        "employmentType": "FULL_TIME",
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "{{ job.company }}"
+        },
+        "jobLocation": {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "{{ job.location }}",
+            "addressCountry": "ME"
+          }
+        },
+        "url": "{{ job.url }}"
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
 <section class="page-title style-two">
   <div class="auto-container">
     <!-- Job Search Form -->

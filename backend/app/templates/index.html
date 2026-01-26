@@ -1,5 +1,45 @@
-{% extends "base.html" %} {% block title %} Poslici.me {% endblock %} {% block
-content %}
+{% extends "base.html" %}
+
+{% block title %}PosaoHub - Poslovi u Crnoj Gori | Pronađi posao danas{% endblock %}
+
+{% block description %}Pronađite posao u Crnoj Gori među {{total}} aktivnih oglasa. Poslovi u Budvi, Podgorici, Tivatu, Herceg Novom. Besplatna pretraga svih poslova na jednom mjestu.{% endblock %}
+
+{% block content %}
+
+<!-- JSON-LD Structured Data for Website -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "PosaoHub",
+  "url": "https://posaohub.me",
+  "description": "Najnaprednija platforma za zapošljavanje u Crnoj Gori",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://posaohub.me/job-search?title={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "inLanguage": "sr-ME"
+}
+</script>
+
+<!-- JSON-LD for Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "PosaoHub",
+  "url": "https://posaohub.me",
+  "logo": "https://posaohub.me{{ url_for('static', path='images/logo.svg') }}",
+  "sameAs": [],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "Customer Service",
+    "areaServed": "ME",
+    "availableLanguage": ["Serbian", "Montenegrin"]
+  }
+}
+</script>
 <!-- Banner Section Three-->
 <section class="banner-section-three at-home18">
   <div class="auto-container">
@@ -12,7 +52,7 @@ content %}
               Najnaprednija platforma za zapošljavanje u Crnoj Gori — svi
               poslovi na jednom mjestu.
               <br>
-              Pronađite svoju karijernu priliku među {{total}} poslova.
+              Pronađite svoju karijernu priliku među {{total}} aktivnih poslova.
             </div>
           </div>
           <!-- Job Search Form -->
@@ -94,8 +134,8 @@ content %}
                 </li>
               </ul>
               <ul class="job-other-info">
+                <li class="privacy">{{jobs[0].expires}}</li>
                 <li class="required">{{jobs[0].source}}</li>
-                <li class="time">{{jobs[0].expires}}</li>
               </ul>
               <button class="bookmark-btn">
                 <span class="flaticon-bookmark"></span>
@@ -122,8 +162,8 @@ content %}
                 </li>
               </ul>
               <ul class="job-other-info">
+                <li class="privacy">{{jobs[1].expires}}</li>
                 <li class="required">{{jobs[1].source}}</li>
-                <li class="time">{{jobs[1].expires}}</li>
               </ul>
               <button class="bookmark-btn">
                 <span class="flaticon-bookmark"></span>
@@ -150,8 +190,8 @@ content %}
                 </li>
               </ul>
               <ul class="job-other-info">
+                <li class="privacy">{{jobs[2].expires}}</li>
                 <li class="required">{{jobs[2].source}}</li>
-                <li class="time">{{jobs[2].expires}}</li>
               </ul>
               <button class="bookmark-btn">
                 <span class="flaticon-bookmark"></span>
@@ -164,4 +204,6 @@ content %}
   </div>
 </section>
 {% include "partials/featured-cities.html" %} {% include
-"partials/featured-jobs.html" %} {% endblock %}
+"partials/featured-jobs.html" %} 
+{% include "partials/jobseeker.html" %}
+{% endblock %}
