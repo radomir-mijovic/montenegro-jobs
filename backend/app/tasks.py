@@ -9,7 +9,8 @@ from app.scrapers import get_scraper
 from app.scrapers.base import Job as JobCreate
 from app.scrapers.prekoveze import last_page_number as prekoveze_last_page_number
 from app.scrapers.zaposlime import last_page_number as zaposlime_last_page_number
-from celery import chord, group
+from celery import chord
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
 logger = logging.getLogger(__name__)
@@ -83,23 +84,39 @@ def cleanup_expired_jobs(results):
 
 
 def save_jobs(jobs: list[JobCreate], existing_by_url: dict, session: Session) -> None:
+    saved = 0
+    updated = 0
+    skipped = 0
+
     for job_data in jobs:
         existing = existing_by_url.get(job_data.url)
 
         if existing is None:
-            session.add(Job(**job_data.model_dump()))
+            try:
+                session.add(Job(**job_data.model_dump()))
+                session.commit()
+                saved += 1
+            except IntegrityError:
+                session.rollback()
+                logger.warning(f"Duplicated URL skipped: {job_data.url}")
             continue
 
-        updated: bool = False
+        is_updated: bool = False
 
         if existing.expires != job_data.expires:
             existing.expires = job_data.expires
-            updated = True
+            is_updated = True
 
-        if updated:
-            session.add(existing)
+        if is_updated:
+            try:
+                session.add(existing)
+                session.commit()
+                updated += 1
+            except IntegrityError:
+                session.rollback()
+                skipped += 1
 
-    session.commit()
+    logger.info(f"Saved {saved}, Updated: {updated}, Skipped: {skipped}")
 
 
 def get_existing_jobs_url(jobs: list[JobCreate], session) -> dict:

@@ -30,7 +30,7 @@ class ZaposliMe(BaseScraper):
                 jobs.append(job)
 
             except Exception as e:
-                logger.warning(f"Error parsing job: {e}")
+                logger.warning(f"Error parsing job for zaposlime: {e}")
                 continue
 
         return jobs

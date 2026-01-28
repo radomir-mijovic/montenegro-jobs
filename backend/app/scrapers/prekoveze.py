@@ -29,7 +29,7 @@ class PrekoVeze(BaseScraper):
                 jobs.append(job)
 
             except Exception as e:
-                logger.warning(f"Error parsing job: {e}")
+                logger.warning(f"Error parsing job for prekoveze: {e}")
                 continue
 
         return jobs

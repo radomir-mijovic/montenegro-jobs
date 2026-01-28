@@ -31,7 +31,7 @@ class ZzzCg(BaseScraper):
                     jobs.append(job)
 
             except Exception as e:
-                logger.warning(f"Error parsing job: {e}")
+                logger.warning(f"Error parsing job for zzzcg: {e}")
                 continue
 
         return jobs
