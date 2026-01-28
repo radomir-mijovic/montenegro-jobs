@@ -24,7 +24,7 @@ class Job(BaseModel):
 class BaseScraper(ABC):
     BASE_URL: str
 
-    def __init__(self, delay: float = 1.0) -> None:
+    def __init__(self, delay: float = 3.0) -> None:
         self.delay = delay
         self.session = requests.Session()
         self.session.headers.update(self._get_headers())
