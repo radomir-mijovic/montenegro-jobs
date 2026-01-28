@@ -2,9 +2,8 @@ import logging
 from typing import List
 
 import requests
-from bs4 import BeautifulSoup
-
 from app.scrapers.utils import convert_date
+from bs4 import BeautifulSoup
 
 from .base import BaseScraper, Job
 
@@ -50,18 +49,14 @@ class ZaposliMe(BaseScraper):
 
         items = card.find_all("li", class_="list-inline-item")
         location = items[1].get_text(strip=True) if items else "N/A"
-        date_posted = items[0].get_text(strip=True) if items else None
-
-        if date_posted:
-            date_posted_object = convert_date(date_posted)
-        else:
-            date_posted_object = None
+        date_posted = items[0].get_text(strip=True) if items else "N/A"
+        date_posted_object = convert_date(date_posted)
 
         detail_html = requests.get(url).text
         detail_soup = BeautifulSoup(detail_html, "html.parser")
 
         expires_elem = detail_soup.find("span", class_="ms-4").find_next("span")
-        expires = expires_elem.get_text(strip=True)
+        expires = expires_elem.get_text(strip=True) if expires_elem else "N/A"
         expires_date_object = convert_date(expires)
 
         return Job(
@@ -74,3 +69,21 @@ class ZaposliMe(BaseScraper):
             source="zaposli.me",
             img=img,
         )
+
+    def last_page_number(self) -> int | None:
+        url = self.BASE_URL + "oglasi-za-posao"
+        html = self._fetch_page(url)
+        if not html:
+            return None
+
+        soup = BeautifulSoup(html, "html.parser")
+        pagination_items = soup.find_all("li", class_="page-item")
+        last_page_str = (
+            pagination_items[-2].get_text(strip=True) if pagination_items else None
+        )
+        if last_page_str:
+            return int(last_page_str)
+
+
+_zaposlime = ZaposliMe()
+last_page_number = _zaposlime.last_page_number()

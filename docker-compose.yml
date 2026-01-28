@@ -99,6 +99,7 @@ services:
     container_name: montenegro-jobs-nginx
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
       - backend
     networks:

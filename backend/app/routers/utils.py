@@ -99,8 +99,8 @@ def get_featured_cities(session: Session):
     herceg_novi_jobs = session.exec(
         select(func.count()).select_from(Job).where(Job.location.ilike("%Herceg Novi%"))
     ).one()
-    berane_jobs = session.exec(
-        select(func.count()).select_from(Job).where(Job.location.ilike("%Berane%"))
+    kotor_jobs = session.exec(
+        select(func.count()).select_from(Job).where(Job.location.ilike("%Kotor%"))
     ).one()
 
     cities = [
@@ -125,9 +125,9 @@ def get_featured_cities(session: Session):
             "image": "images/cities/tivat.avif",
         },
         {
-            "title": "Berane",
-            "total_jobs": berane_jobs,
-            "image": "images/cities/berane.jpg",
+            "title": "Kotor",
+            "total_jobs": kotor_jobs,
+            "image": "images/cities/kotor.jpg",
         },
     ]
     return cities

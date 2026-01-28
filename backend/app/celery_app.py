@@ -1,6 +1,7 @@
 import os
 
 from celery import Celery
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,10 +25,18 @@ celery_app.conf.update(
 )
 
 celery_app.conf.beat_schedule = {
-    "scrape-jobs-every-minute": {
+    "scrape-jobs-morning": {
         "task": "app.tasks.scrape_all_jobs",
-        "schedule": 600.0,
-    }
+        "schedule": crontab(hour=8, minute=0),
+    },
+    "scrape-jobs-noon": {
+        "task": "app.tasks.scrape_all_jobs",
+        "schedule": crontab(hour=12, minute=0),
+    },
+    "scrape-jobs-afternoon": {
+        "task": "app.tasks.scrape_all_jobs",
+        "schedule": crontab(hour=17, minute=0),
+    },
 }
 
 celery_app.autodiscover_tasks(["app.tasks"])

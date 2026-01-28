@@ -1,4 +1,7 @@
+import logging
 from datetime import date, datetime
+
+logger = logging.getLogger(__name__)
 
 MONTHS_TO_MAP: dict[str, str] = {
     "januar": "01",
@@ -16,7 +19,7 @@ MONTHS_TO_MAP: dict[str, str] = {
 }
 
 
-def convert_date(date_str: str) -> date:
+def convert_date(date_str: str, source: str | None = None) -> date | None:
     """Function that convert str date to datetime.date object
 
     Args:
@@ -27,39 +30,48 @@ def convert_date(date_str: str) -> date:
     """
     date_str = date_str.strip().lower().rstrip(".")
 
-    if "/" in date_str:
-        return datetime.strptime(date_str, "%d/%m/%Y").date()
+    try:
+        if "/" in date_str:
+            return datetime.strptime(date_str, "%d/%m/%Y").date()
 
-    elif "." in date_str:
-        parts = [p.strip() for p in date_str.split(".") if p.strip()]
-        # Check if it's numeric format (DD.MM.YYYY) - all parts should be digits
-        if len(parts) == 3 and all(p.isdigit() for p in parts):
-            day = parts[0].zfill(2)
-            month = parts[1].zfill(2)
-            year = parts[2]
-            numeric_date = f"{day}.{month}.{year}"
-            return datetime.strptime(numeric_date, "%d.%m.%Y").date()
-        # Otherwise, treat as Serbian month name format: "23. januar 2026"
+        elif "." in date_str:
+            parts = [p.strip() for p in date_str.split(".") if p.strip()]
+            # Check if it's numeric format (DD.MM.YYYY) - all parts should be digits
+            if len(parts) == 3 and all(p.isdigit() for p in parts):
+                day = parts[0].zfill(2)
+                month = parts[1].zfill(2)
+                year = parts[2]
+                numeric_date = f"{day}.{month}.{year}"
+                return datetime.strptime(numeric_date, "%d.%m.%Y").date()
+            # Otherwise, treat as Serbian month name format: "23. januar 2026"
+            else:
+                clean_str = date_str.replace(".", "").strip()
+                parts = clean_str.split()
+
+                if len(parts) != 3:
+                    raise ValueError(f"Cannot parse date: {date_str}")
+                day, month_name, year = parts
+                month = MONTHS_TO_MAP.get(month_name)
+
+                if not month:
+                    raise ValueError(f"Unknown month: {month_name}")
+                numeric_date = f"{day.zfill(2)}.{month}.{year}"
+                return datetime.strptime(numeric_date, "%d.%m.%Y").date()
+
+        # Serbian month name format without dots: "14 januar 2026"
         else:
-            clean_str = date_str.replace(".", "").strip()
-            parts = clean_str.split()
+            parts = date_str.split()
+
             if len(parts) != 3:
                 raise ValueError(f"Cannot parse date: {date_str}")
             day, month_name, year = parts
             month = MONTHS_TO_MAP.get(month_name)
+
             if not month:
                 raise ValueError(f"Unknown month: {month_name}")
             numeric_date = f"{day.zfill(2)}.{month}.{year}"
             return datetime.strptime(numeric_date, "%d.%m.%Y").date()
 
-    # Serbian month name format without dots: "14 januar 2026"
-    else:
-        parts = date_str.split()
-        if len(parts) != 3:
-            raise ValueError(f"Cannot parse date: {date_str}")
-        day, month_name, year = parts
-        month = MONTHS_TO_MAP.get(month_name)
-        if not month:
-            raise ValueError(f"Unknown month: {month_name}")
-        numeric_date = f"{day.zfill(2)}.{month}.{year}"
-        return datetime.strptime(numeric_date, "%d.%m.%Y").date()
+    except Exception as e:
+        logger.warning(f"Unable to format date for {source}: {e}")
+        return None

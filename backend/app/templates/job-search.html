@@ -106,12 +106,9 @@
             {% include "partials/job-result.html" %}
           </div>
 
+          {% if not is_searched %}
           <nav class="ls-pagination">
             <div class="ls-show-more">
-              <p>Showing <span id="job-count">{{ jobs|length }}</span> Jobs</p>
-              <div class="bar">
-                <span class="bar-inner" style="width: 40%"></span>
-              </div>
               <button
                 class="show-more"
                 hx-get="/job-query"
@@ -130,6 +127,8 @@
               </button>
             </div>
           </nav>
+          {% endif %}
+
         </div>
       </div>
     </div>

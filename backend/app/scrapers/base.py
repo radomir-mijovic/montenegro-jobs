@@ -17,7 +17,7 @@ class Job(BaseModel):
     url: str
     source: str
     date_posted: date | None
-    expires: date
+    expires: date | None
     img: str
 
 

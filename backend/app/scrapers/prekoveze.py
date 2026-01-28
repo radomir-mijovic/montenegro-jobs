@@ -1,9 +1,8 @@
 import logging
 from typing import List
 
-from bs4 import BeautifulSoup
-
 from app.scrapers.utils import convert_date
+from bs4 import BeautifulSoup
 
 from .base import BaseScraper, Job
 
@@ -53,7 +52,7 @@ class PrekoVeze(BaseScraper):
             else "N/A"
         )
         expires_str = expires.replace("Važi do: ", "")
-        expires_date_object = convert_date(expires_str)
+        expires_date_object = convert_date(expires_str, source="prekoveze")
 
         return Job(
             title=title,
@@ -65,3 +64,22 @@ class PrekoVeze(BaseScraper):
             source="prekoveze.me",
             img=img,
         )
+
+    def last_page_number(self) -> int | None:
+        url = self.BASE_URL + "oglasi-za-posao"
+        html = self._fetch_page(url)
+
+        if not html:
+            return None
+
+        soup = BeautifulSoup(html, "html.parser")
+        pagination_items = soup.find_all("a", class_="page-link")
+        last_page_str = (
+            pagination_items[-2].get_text(strip=True) if pagination_items else None
+        )
+        if last_page_str:
+            return int(last_page_str)
+
+
+_prekoveze = PrekoVeze()
+last_page_number = _prekoveze.last_page_number()

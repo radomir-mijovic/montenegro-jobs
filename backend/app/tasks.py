@@ -1,19 +1,24 @@
 import logging
 
+import redis
 from app.celery_app import celery_app
 from app.db import SessionLocal
 from app.models import Job
 from app.scrapers import get_scraper
 from app.scrapers.base import Job as JobCreate
-from celery import group
-from sqlmodel import select
+from app.scrapers.prekoveze import last_page_number as prekoveze_last_page_number
+from app.scrapers.zaposlime import last_page_number as zaposlime_last_page_number
+from celery import chord, group
+from sqlmodel import Session, select
 
 logger = logging.getLogger(__name__)
 
-SOURCES: dict[str, int] = {
-    "prekoveze": 5,
-    "zaposlime": 5,
-    "zzzcg": 5,
+redis_client = redis.Redis(decode_responses=True)
+
+SOURCES: dict[str, int | None] = {
+    "prekoveze": prekoveze_last_page_number if prekoveze_last_page_number else 20,
+    "zaposlime": zaposlime_last_page_number if zaposlime_last_page_number else 40,
+    "zzzcg": 70,
 }
 
 
@@ -23,12 +28,16 @@ def scrape_single_source(self, source: str, max_pages: int):
     logger.info(f"Starting scraping job for {source}")
 
     session = SessionLocal()
+
     try:
         try:
             scraper = get_scraper(scraper=source)
             jobs = scraper.scrape(max_pages=max_pages)
 
             if jobs:
+                # adding new jobs url in redis so that expired ones can be deleted
+                redis_client.sadd("current_scraped_urls", *[job.url for job in jobs])
+
                 existing_by_url = get_existing_jobs_url(jobs, session)
                 save_jobs(jobs, existing_by_url, session)
 
@@ -48,16 +57,32 @@ def scrape_single_source(self, source: str, max_pages: int):
 @celery_app.task(name="app.tasks.scrape_all_jobs")
 def scrape_all_jobs():
     """Coordinator taks that triggers all scrapers in parralel"""
-    job = group(
-        scrape_single_source.s(source, max_pages)
-        for source, max_pages in SOURCES.items()
+    job = chord(
+        (
+            scrape_single_source.s(source, max_pages)
+            for source, max_pages in SOURCES.items()
+        ),
+        cleanup_expired_jobs.s(),
     )
     return job.apply_async()
 
 
-def save_jobs(jobs: list[JobCreate], existing_by_url: dict, session) -> None:
+@celery_app.task(name="app.tasts.cleanup_expired_jobs")
+def cleanup_expired_jobs(results):
+    """Runs after all scrapers complete to delete expired jobs"""
+    session = SessionLocal()
+    try:
+        delete_expired_ones_from_database(session)
+        redis_client.delete("current_scraped_urls")
+        logger.info("Cleant up finished")
+    finally:
+        session.close()
+
+
+def save_jobs(jobs: list[JobCreate], existing_by_url: dict, session: Session) -> None:
     for job_data in jobs:
         existing = existing_by_url.get(job_data.url)
+
         if existing is None:
             session.add(Job(**job_data.model_dump()))
             continue
@@ -78,3 +103,21 @@ def get_existing_jobs_url(jobs: list[JobCreate], session) -> dict:
     urls = [job.url for job in jobs]
     existing_jobs = session.exec(select(Job).where(Job.url.in_(urls))).all()
     return {job.url: job for job in existing_jobs}
+
+
+def delete_expired_ones_from_database(session: Session) -> None:
+    jobs = session.exec(select(Job)).all()
+    existing = {job.url for job in jobs}
+    new_urls_from_scrape = redis_client.smembers("current_scraped_urls")
+
+    if existing and new_urls_from_scrape:
+        expired = existing - new_urls_from_scrape  # type: ignore
+
+        if expired:
+            query = select(Job).where(Job.url.in_(expired))
+            jobs_to_delete = session.exec(query).all()
+
+            for job in jobs_to_delete:
+                session.delete(job)
+
+        session.commit()

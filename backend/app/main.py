@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from app.db import init_db
 from app.routers import pages
+from app.tasks import scrape_all_jobs
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -20,6 +21,10 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing database")
     init_db()
     logger.info("Database initialized successfully")
+
+    scrape_all_jobs.delay()
+    logger.info("Triggering inital scraping")
+
     yield
     logger.info("Shutting down application...")
 

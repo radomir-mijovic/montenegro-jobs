@@ -4,7 +4,6 @@ from app.routers.utils import get_featured_cities, get_featured_jobs, get_querie
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from jinja2.environment import TemplateModule
 from sqlalchemy.sql import func
 from sqlmodel import Session, select
 
@@ -51,6 +50,8 @@ def job_search(
     if has_more:
         jobs = jobs[:limit]
 
+    is_searched = title is not None
+
     return templates.TemplateResponse(
         request=request,
         name="job-search.html",
@@ -60,6 +61,7 @@ def job_search(
             "city": city or "",
             "has_search": bool(title or city),
             "has_more": has_more,
+            "is_searched": is_searched,
         },
     )
 
@@ -69,7 +71,7 @@ def job_query(
     request: Request,
     title: str | None = None,
     city: str | None = None,
-    limit: int = 10,
+    limit: int = 9999,
     offset: int = 0,
     session: Session = Depends(get_session),
 ):
@@ -79,15 +81,12 @@ def job_query(
     jobs = get_queried_jobs(
         title=title, city=city, limit=limit, offset=offset, session=session
     )
-    has_more = len(jobs) > limit
-
-    if has_more:
-        jobs = jobs[:limit]
+    is_searched = title is not None
 
     return templates.TemplateResponse(
         request=request,
         name="partials/job-result.html",
-        context={"jobs": jobs, "has_more": has_more},
+        context={"jobs": jobs, "is_searched": is_searched, "jobs_len": len(jobs)},
     )
 
 

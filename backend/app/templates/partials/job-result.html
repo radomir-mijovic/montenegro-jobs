@@ -4,7 +4,7 @@
     <div class="content">
       <span class="company-logo"><img src="{{job.img}}" alt="" /></span>
       <h4>
-        <a href="{{job.url}}">{{ job.title }}</a>
+        <a href="{{job.url}}" target="_blank">{{ job.title }}</a>
       </h4>
       <ul class="job-info">
         <li>
@@ -22,8 +22,17 @@
   </div>
 </div>
 {% endfor %}
-
-{% if not has_more %}
+{% if is_searched %}
+      <nav class="ls-pagination">
+            <div class="ls-show-more">
+              <p>Showing <span id="job-count">{{ jobs_len }}</span> Jobs</p>
+              <div class="bar">
+                <span class="bar-inner" style="width: 100%"></span>
+              </div>
+          </div>
+      </nav>
+{% endif %}
+{% if is_searched %}
 <script>
   document.querySelector('.show-more')?.remove();
 </script>
