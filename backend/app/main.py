@@ -1,7 +1,6 @@
 import logging
 from contextlib import asynccontextmanager
 
-from app.db import init_db
 from app.routers import pages
 from app.tasks import scrape_all_jobs
 from fastapi import FastAPI
@@ -18,9 +17,8 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting application")
-    logger.info("Initializing database")
-    init_db()
-    logger.info("Database initialized successfully")
+    # Database schema is managed by Alembic migrations
+    # Run: alembic upgrade head
 
     #scrape_all_jobs.delay()
     logger.info("Triggering inital scraping")
