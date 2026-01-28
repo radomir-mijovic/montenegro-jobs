@@ -22,7 +22,7 @@ async def lifespan(app: FastAPI):
     init_db()
     logger.info("Database initialized successfully")
 
-    scrape_all_jobs.delay()
+    #scrape_all_jobs.delay()
     logger.info("Triggering inital scraping")
 
     yield
