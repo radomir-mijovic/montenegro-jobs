@@ -6538,6 +6538,7 @@ Mobile Header
   z-index: 99;
   background-color: #ffffff;
   box-shadow: 0px 6px 15px rgba(64, 79, 104, 0.05);
+  text-align: center;
 }
 
 .mobile-header:after {
@@ -6548,10 +6549,9 @@ Mobile Header
 
 .mobile-header .logo {
   position: relative;
-  float: left;
   margin: 0 !important;
   padding: 0 !important;
-  left: 0;
+  display: inline-block;
 }
 
 .mobile-header .logo img {
