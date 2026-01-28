@@ -1,4 +1,5 @@
 import logging
+import os
 
 import redis
 from app.celery_app import celery_app
@@ -13,7 +14,9 @@ from sqlmodel import Session, select
 
 logger = logging.getLogger(__name__)
 
-redis_client = redis.Redis(decode_responses=True)
+# Get Redis URL from environment variable
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
 SOURCES: dict[str, int | None] = {
     "prekoveze": prekoveze_last_page_number if prekoveze_last_page_number else 20,
