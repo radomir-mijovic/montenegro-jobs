@@ -19,7 +19,9 @@ MONTHS_TO_MAP: dict[str, str] = {
 }
 
 
-def convert_date(date_str: str, source: str | None = None) -> date | None:
+def convert_date(
+    date_str: str, source: str | None = None, date_source: str | None = None
+) -> date | None:
     """Function that convert str date to datetime.date object
 
     Args:
@@ -73,5 +75,5 @@ def convert_date(date_str: str, source: str | None = None) -> date | None:
             return datetime.strptime(numeric_date, "%d.%m.%Y").date()
 
     except Exception as e:
-        logger.warning(f"Unable to format date for {source}: {e}")
+        logger.warning(f"Unable to format date for {source} for {date_source}: {e}")
         return None

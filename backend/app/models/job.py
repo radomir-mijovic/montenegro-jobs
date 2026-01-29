@@ -12,6 +12,6 @@ class Job(SQLModel, table=True):
     url: str = Field(unique=True)
     location: str = Field()
     date_posted: date | None = Field(default_factory=None)
-    expires: date = Field()
+    expires: date | None = Field(default_factory=None)
     img: str = Field()
     source: str = Field()

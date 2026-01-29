@@ -22,7 +22,7 @@ redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 SOURCES: dict[str, int | None] = {
     "prekoveze": prekoveze_last_page_number if prekoveze_last_page_number else 20,
     "zaposlime": zaposlime_last_page_number if zaposlime_last_page_number else 40,
-    "zzzcg": 70,
+    "zzzcg": 55,
 }
 
 
@@ -84,9 +84,9 @@ def cleanup_expired_jobs(results):
 
 
 def save_jobs(jobs: list[JobCreate], existing_by_url: dict, session: Session) -> None:
-    saved = 0
-    updated = 0
-    skipped = 0
+    saved: int = 0
+    updated: int = 0
+    skipped: int = 0
 
     for job_data in jobs:
         existing = existing_by_url.get(job_data.url)
@@ -138,6 +138,7 @@ def delete_expired_ones_from_database(session: Session) -> None:
             jobs_to_delete = session.exec(query).all()
 
             for job in jobs_to_delete:
+                logger.info(f"Deleted expired job: {job}")
                 session.delete(job)
 
         session.commit()
