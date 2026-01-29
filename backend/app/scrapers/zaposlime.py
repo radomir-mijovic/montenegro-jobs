@@ -1,7 +1,6 @@
 import logging
 from typing import List
 
-import requests
 from app.scrapers.utils import convert_date
 from bs4 import BeautifulSoup
 
@@ -52,7 +51,7 @@ class ZaposliMe(BaseScraper):
         date_posted = items[0].get_text(strip=True) if items else "N/A"
         date_posted_object = convert_date(date_posted)
 
-        detail_html = requests.get(url).text
+        detail_html = self.session.get(url, timeout=10).text
         detail_soup = BeautifulSoup(detail_html, "html.parser")
 
         expires_elem = detail_soup.find("span", class_="ms-4").find_next("span")
