@@ -1,7 +1,7 @@
 import logging
 import os
+from datetime import date
 
-import redis
 from app.celery_app import celery_app
 from app.db import SessionLocal
 from app.models import Job
@@ -15,9 +15,6 @@ from sqlmodel import Session, select
 
 logger = logging.getLogger(__name__)
 
-# Get Redis URL from environment variable
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-redis_client = redis.from_url(REDIS_URL, decode_responses=True)
 
 SOURCES: dict[str, int | None] = {
     "prekoveze": prekoveze_last_page_number if prekoveze_last_page_number else 20,
@@ -39,9 +36,6 @@ def scrape_single_source(self, source: str, max_pages: int):
             jobs = scraper.scrape(max_pages=max_pages)
 
             if jobs:
-                # adding new jobs url in redis so that expired ones can be deleted
-                redis_client.sadd("current_scraped_urls", *[job.url for job in jobs])
-
                 existing_by_url = get_existing_jobs_url(jobs, session)
                 save_jobs(jobs, existing_by_url, session)
 
@@ -77,7 +71,6 @@ def cleanup_expired_jobs(results):
     session = SessionLocal()
     try:
         delete_expired_ones_from_database(session)
-        redis_client.delete("current_scraped_urls")
         logger.info("Cleant up finished")
     finally:
         session.close()
@@ -126,19 +119,18 @@ def get_existing_jobs_url(jobs: list[JobCreate], session) -> dict:
 
 
 def delete_expired_ones_from_database(session: Session) -> None:
-    jobs = session.exec(select(Job)).all()
-    existing = {job.url for job in jobs}
-    new_urls_from_scrape = redis_client.smembers("current_scraped_urls")
+    query = select(Job).where(
+        Job.expires.is_not(None),  # type: ignore
+        Job.expires < date.today()  # type: ignore
+    )
+    jobs_to_delete = session.exec(query).all()
 
-    if existing and new_urls_from_scrape:
-        expired = existing - new_urls_from_scrape  # type: ignore
-
-        if expired:
-            query = select(Job).where(Job.url.in_(expired))
-            jobs_to_delete = session.exec(query).all()
-
-            for job in jobs_to_delete:
-                logger.info(f"Deleted expired job: {job}")
-                session.delete(job)
+    if jobs_to_delete:
+        for job in jobs_to_delete:
+            logger.info(f"Deleted expired job: {job.title}, expired: {job.expires}")
+            session.delete(job)
 
         session.commit()
+        logger.info(f"Deleted {len(jobs_to_delete)} expired jobs")
+    else:
+        logger.info("No expired jobs to delete")
