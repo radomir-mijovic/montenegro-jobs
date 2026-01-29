@@ -18,6 +18,22 @@ MONTHS_TO_MAP: dict[str, str] = {
     "decembar": "12",
 }
 
+# Genitive case (used with "do" - until): "08. februara"
+MONTHS_GENITIVE_TO_MAP: dict[str, str] = {
+    "januara": "01",
+    "februara": "02",
+    "marta": "03",
+    "aprila": "04",
+    "maja": "05",
+    "juna": "06",
+    "jula": "07",
+    "avgusta": "08",
+    "septembra": "09",
+    "oktobra": "10",
+    "novembra": "11",
+    "decembra": "12",
+}
+
 
 def convert_date(
     date_str: str, source: str | None = None, date_source: str | None = None
@@ -45,34 +61,78 @@ def convert_date(
                 year = parts[2]
                 numeric_date = f"{day}.{month}.{year}"
                 return datetime.strptime(numeric_date, "%d.%m.%Y").date()
-            # Otherwise, treat as Serbian month name format: "23. januar 2026"
+            # Otherwise, treat as Serbian month name format: "23. januar 2026" or "13. februara"
             else:
                 clean_str = date_str.replace(".", "").strip()
                 parts = clean_str.split()
 
-                if len(parts) != 3:
+                if len(parts) == 2:
+                    # Format: "13. februara" (day and month only, no year)
+                    day, month_name = parts
+                    # Try both nominative and genitive forms
+                    month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
+
+                    if not month:
+                        raise ValueError(f"Unknown month: {month_name}")
+
+                    # Assume current year
+                    current_year = datetime.now().year
+                    parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year}", "%d.%m.%Y").date()
+
+                    # If the date has already passed this year, assume next year
+                    if parsed_date < date.today():
+                        parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year + 1}", "%d.%m.%Y").date()
+
+                    return parsed_date
+
+                elif len(parts) == 3:
+                    # Format: "23. januar 2026"
+                    day, month_name, year = parts
+                    # Try both nominative and genitive forms
+                    month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
+
+                    if not month:
+                        raise ValueError(f"Unknown month: {month_name}")
+                    numeric_date = f"{day.zfill(2)}.{month}.{year}"
+                    return datetime.strptime(numeric_date, "%d.%m.%Y").date()
+                else:
                     raise ValueError(f"Cannot parse date: {date_str}")
+
+        # Serbian month name format without dots: "14 januar 2026" or "11 februar" (no year)
+        else:
+            parts = date_str.split()
+
+            if len(parts) == 2:
+                # Format: "11 februar" (no year)
+                day, month_name = parts
+                # Try both nominative and genitive forms
+                month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
+
+                if not month:
+                    raise ValueError(f"Unknown month: {month_name}")
+
+                # Assume current year
+                current_year = datetime.now().year
+                parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year}", "%d.%m.%Y").date()
+
+                # If the date has already passed this year, assume next year
+                if parsed_date < date.today():
+                    parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year + 1}", "%d.%m.%Y").date()
+
+                return parsed_date
+
+            elif len(parts) == 3:
+                # Format: "14 januar 2026"
                 day, month_name, year = parts
-                month = MONTHS_TO_MAP.get(month_name)
+                # Try both nominative and genitive forms
+                month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
 
                 if not month:
                     raise ValueError(f"Unknown month: {month_name}")
                 numeric_date = f"{day.zfill(2)}.{month}.{year}"
                 return datetime.strptime(numeric_date, "%d.%m.%Y").date()
-
-        # Serbian month name format without dots: "14 januar 2026"
-        else:
-            parts = date_str.split()
-
-            if len(parts) != 3:
+            else:
                 raise ValueError(f"Cannot parse date: {date_str}")
-            day, month_name, year = parts
-            month = MONTHS_TO_MAP.get(month_name)
-
-            if not month:
-                raise ValueError(f"Unknown month: {month_name}")
-            numeric_date = f"{day.zfill(2)}.{month}.{year}"
-            return datetime.strptime(numeric_date, "%d.%m.%Y").date()
 
     except Exception as e:
         logger.warning(f"Unable to format date for {source} for {date_source}: {e}")

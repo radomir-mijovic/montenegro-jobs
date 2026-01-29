@@ -1,4 +1,5 @@
 from .prekoveze import PrekoVeze
+from .radnikme import RadnikMe
 from .zaposlime import ZaposliMe
 from .zzzcg import ZzzCg
 
@@ -6,6 +7,7 @@ SCRAPER_REGISTRY = {
     "prekoveze": PrekoVeze,
     "zaposlime": ZaposliMe,
     "zzzcg": ZzzCg,
+    "radnikme": RadnikMe,
 }
 
 
