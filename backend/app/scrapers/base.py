@@ -31,7 +31,7 @@ class BaseScraper(ABC):
 
     def _get_headers(self) -> dict:
         return {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebkit/537.36"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
 
     def _fetch_page(self, url: str) -> str | None:
@@ -60,7 +60,7 @@ class BaseScraper(ABC):
     def scrape(self, max_pages: int = 1) -> List[Job] | None:
         jobs = []
 
-        for page in range(max_pages):
+        for page in range(1, max_pages + 1):
             logger.info(f"Scraping jobs for {self}")
             url = self._build_url(page)
             html = self._fetch_page(url)
