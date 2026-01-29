@@ -119,7 +119,10 @@ def get_existing_jobs_url(jobs: list[JobCreate], session) -> dict:
 
 
 def delete_expired_ones_from_database(session: Session) -> None:
-    query = select(Job).where(Job.expires.is_not(None), Job.expires < date.today())
+    query = select(Job).where(
+        Job.expires.is_not(None),  # type: ignore
+        Job.expires < date.today()  # type: ignore
+    )
     jobs_to_delete = session.exec(query).all()
 
     if jobs_to_delete:
