@@ -23,7 +23,9 @@
         </li>
       </ul>
       <ul class="job-other-info">
-        <li class="privacy">{{ job.expires }}</li>
+          {% if job.expires %}
+        <li class="privacy">{{ job.expires.strftime("%d.%m.%Y") }}</li>
+        {% endif %}
         <li class="required">{{ job.source }}</li>
       </ul>
     </div>

@@ -134,7 +134,9 @@
                 </li>
               </ul>
               <ul class="job-other-info">
-                <li class="privacy">{{jobs[0].expires}}</li>
+          {% if jobs[0].expires %}
+                <li class="privacy">{{jobs[0].expires.strftime("%d.%m.%Y")}}</li>
+        {% endif %}
                 <li class="required">{{jobs[0].source}}</li>
               </ul>
             </div>
@@ -159,7 +161,9 @@
                 </li>
               </ul>
               <ul class="job-other-info">
-                <li class="privacy">{{jobs[1].expires}}</li>
+          {% if jobs[1].expires %}
+                <li class="privacy">{{jobs[1].expires.strftime("%d.%m.%Y")}}</li>
+        {% endif %}
                 <li class="required">{{jobs[1].source}}</li>
               </ul>
             </div>
@@ -184,7 +188,9 @@
                 </li>
               </ul>
               <ul class="job-other-info">
-                <li class="privacy">{{jobs[2].expires}}</li>
+          {% if jobs[2].expires %}
+                <li class="privacy">{{jobs[2].expires.strftime("%d.%m.%Y")}}</li>
+        {% endif %}
                 <li class="required">{{jobs[2].source}}</li>
               </ul>
             </div>
