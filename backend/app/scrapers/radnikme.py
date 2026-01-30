@@ -121,7 +121,6 @@ class RadnikMe(BaseScraper):
 
         items = card.find_all("div", class_="job-category-text")
         location = items[0].get_text(strip=True) if items else "N/A"
-        company = items[1].get_text(strip=True) if items else "N/A"
 
         detail_html = self.session.get(url, timeout=10).text
         detail_soup = BeautifulSoup(detail_html, "html.parser")
