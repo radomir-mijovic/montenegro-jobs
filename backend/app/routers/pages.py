@@ -1,7 +1,12 @@
 from app.db import get_session
 from app.models.job import Job
-from app.routers.utils import get_featured_cities, get_featured_jobs, get_queried_jobs
-from fastapi import APIRouter, Depends, Request
+from app.routers.utils import (
+    get_cached_jobs,
+    get_featured_cities,
+    get_featured_jobs,
+    get_queried_jobs,
+)
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.sql import func
@@ -40,15 +45,14 @@ def root(request: Request, session: Session = Depends(get_session)):
 def job_search(
     request: Request,
     session: Session = Depends(get_session),
-    limit: int = 10,
+    limit: int = 99999,
     title: str | None = None,
     city: str | None = None,
 ):
-    jobs = get_queried_jobs(title=title, city=city, limit=limit, session=session)
-    has_more = len(jobs) > limit
-
-    if has_more:
-        jobs = jobs[:limit]
+    if title == "" and city == "":
+        jobs = get_cached_jobs(session=session)
+    else:
+        jobs = get_queried_jobs(title=title, city=city, limit=limit, session=session)
 
     is_searched = title is not None
 
@@ -60,8 +64,8 @@ def job_search(
             "title": title or "",
             "city": city or "",
             "has_search": bool(title or city),
-            "has_more": has_more,
             "is_searched": is_searched,
+            "jobs_len": len(jobs),
         },
     )
 
@@ -72,15 +76,16 @@ def job_query(
     title: str | None = None,
     city: str | None = None,
     limit: int = 9999,
-    offset: int = 0,
     session: Session = Depends(get_session),
 ):
     if request.headers.get("HX-Request") != "true":
         return RedirectResponse("/job-search", status_code=303)
 
-    jobs = get_queried_jobs(
-        title=title, city=city, limit=limit, offset=offset, session=session
-    )
+    if title == "" and city == "":
+        jobs = get_cached_jobs(session=session)
+    else:
+        jobs = get_queried_jobs(title=title, city=city, limit=limit, session=session)
+
     is_searched = title is not None
 
     return templates.TemplateResponse(

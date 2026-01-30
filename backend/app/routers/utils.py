@@ -1,4 +1,6 @@
 from app.models.job import Job
+from app.redis_app import get_jobs_cache, set_jobs_cache
+from app.scrapers.base import Job as JobBase
 from sqlalchemy import text
 from sqlalchemy.sql import func
 from sqlmodel import Session, select
@@ -142,3 +144,15 @@ def get_featured_jobs(session: Session):
     ).all()
 
     return featured_jobs
+
+
+def get_cached_jobs(session: Session):
+    cached_jobs = get_jobs_cache()
+    if cached_jobs:
+        return cached_jobs
+
+    all_jobs = session.exec(select(Job)).all()
+    pydantic_jobs = [JobBase.model_validate(job) for job in all_jobs]
+    set_jobs_cache(pydantic_jobs)
+
+    return pydantic_jobs

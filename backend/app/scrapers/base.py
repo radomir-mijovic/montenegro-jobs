@@ -1,16 +1,17 @@
-from datetime import date
 import logging
 import time
-from pydantic import BaseModel
 from abc import ABC, abstractmethod
+from datetime import date
 from typing import List
 
 import requests
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
 
 class Job(BaseModel):
+    id: int | None = None
     title: str
     company: str
     location: str
@@ -19,6 +20,8 @@ class Job(BaseModel):
     date_posted: date | None
     expires: date | None
     img: str
+
+    model_config = {"from_attributes": True}
 
 
 class BaseScraper(ABC):

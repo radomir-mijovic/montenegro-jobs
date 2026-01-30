@@ -14123,7 +14123,8 @@ Listing Show More
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  margin-top: 50px;
+  margin-top: 0;
+  margin-bottom: 24px;
 }
 
 .ls-show-more p {
@@ -14181,7 +14182,7 @@ Listing Pagination
 ***/
 .ls-pagination {
   position: relative;
-  margin-top: 50px;
+  margin-top: 1inpx;
 }
 
 .ls-pagination ul {

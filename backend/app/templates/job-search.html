@@ -52,7 +52,6 @@
       <form
         hx-get="/job-query"
         hx-target="#job-result"
-        hx-trigger="keyup delay:300ms from:input, submit{% if has_search %}, load{% endif %}"
       >
         <div class="row">
           <!-- Form Group -->
@@ -105,30 +104,6 @@
           <div class="row" id="job-result">
             {% include "partials/job-result.html" %}
           </div>
-
-          {% if not is_searched %}
-          <nav class="ls-pagination">
-            <div class="ls-show-more">
-              <button
-                class="show-more"
-                hx-get="/job-query"
-                hx-target="#job-result"
-                hx-swap="beforeend"
-                hx-vals='js:{offset: parseInt(document.querySelector(".show-more").dataset.offset), limit: 10}'
-                data-offset="{{ jobs|length }}"
-                onclick="
-                  this.dataset.offset = parseInt(this.dataset.offset) + 10;
-                  document.getElementById('job-count').textContent =
-                    parseInt(document.getElementById('job-count').textContent) +
-                    10;
-                "
-              >
-                Show More
-              </button>
-            </div>
-          </nav>
-          {% endif %}
-
         </div>
       </div>
     </div>
