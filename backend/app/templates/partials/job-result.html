@@ -1,3 +1,11 @@
+      <nav class="ls-pagination">
+            <div class="ls-show-more">
+              <p>Showing <span id="job-count">{{ jobs_len }}</span> Jobs</p>
+              <div class="bar">
+                <span class="bar-inner" style="width: 100%"></span>
+              </div>
+          </div>
+      </nav>
 {% for job in jobs %}
 <div class="job-block col-lg-6 col-md-12 col-sm-12">
   <div class="inner-box">
@@ -22,16 +30,6 @@
   </div>
 </div>
 {% endfor %}
-{% if is_searched %}
-      <nav class="ls-pagination">
-            <div class="ls-show-more">
-              <p>Showing <span id="job-count">{{ jobs_len }}</span> Jobs</p>
-              <div class="bar">
-                <span class="bar-inner" style="width: 100%"></span>
-              </div>
-          </div>
-      </nav>
-{% endif %}
 {% if is_searched %}
 <script>
   document.querySelector('.show-more')?.remove();
