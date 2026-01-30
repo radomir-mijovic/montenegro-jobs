@@ -60,7 +60,7 @@ class BaseScraper(ABC):
     def scrape(self, max_pages: int = 1) -> List[Job] | None:
         jobs = []
 
-        for page in range(1, max_pages + 1):
+        for page in range(max_pages + 1):
             logger.info(f"Scraping jobs for {self}")
             url = self._build_url(page)
             html = self._fetch_page(url)

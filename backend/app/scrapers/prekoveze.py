@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class PrekoVeze(BaseScraper):
-    BASE_URL = "https://prekoveze.me/"
+    BASE_URL = "https://prekoveze.me"
 
     def _build_url(self, page: int) -> str:
-        params: str = f"oglasi-za-posao?page={page}"
+        params: str = f"/oglasi-za-posao?page={page}"
         return self.BASE_URL + params
 
     def _parse_listing(self, html: str) -> List[Job]:
