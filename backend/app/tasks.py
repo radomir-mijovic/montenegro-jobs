@@ -20,6 +20,9 @@ SOURCES: dict[str, int | None] = {
     "prekoveze": prekoveze_last_page_number if prekoveze_last_page_number else 20,
     "zaposlime": zaposlime_last_page_number if zaposlime_last_page_number else 40,
     "zzzcg": 55,
+    "radnikme": 1,
+    "berzarada": 4,
+
 }
 
 

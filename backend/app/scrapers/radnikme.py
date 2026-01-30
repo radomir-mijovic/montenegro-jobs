@@ -40,19 +40,19 @@ class RadnikMe(BaseScraper):
         driver = webdriver.Chrome(options=options)
 
         # Hide webdriver property
-        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": """
+        driver.execute_cdp_cmd(
+            "Page.addScriptToEvaluateOnNewDocument",
+            {"source": """
                 Object.defineProperty(navigator, 'webdriver', {
                     get: () => undefined
                 });
-            """
-        })
+            """},
+        )
 
         try:
             driver.get(self.BASE_URL + "/oglasi-za-posao")
             time.sleep(5)  # Initial load - wait for JS to fully load
 
-            last_job_count = 0
             no_change_count = 0
 
             for i in range(self.MAX_SCROLLS):
@@ -66,7 +66,7 @@ class RadnikMe(BaseScraper):
 
                 # Smooth scroll in steps to trigger intersection observer
                 scroll_step = 300
-                for step in range(5):
+                for _ in range(5):
                     driver.execute_script(f"window.scrollBy(0, {scroll_step});")
                     time.sleep(0.5)
 
@@ -80,7 +80,9 @@ class RadnikMe(BaseScraper):
                 job_cards_after = driver.find_elements(By.CLASS_NAME, "job-item")
                 new_job_count = len(job_cards_after)
 
-                logger.info(f"After scroll: {new_job_count} jobs (gained {new_job_count - current_job_count})")
+                logger.info(
+                    f"After scroll: {new_job_count} jobs (gained {new_job_count - current_job_count})"
+                )
 
                 if new_job_count == current_job_count:
                     no_change_count += 1
@@ -90,8 +92,6 @@ class RadnikMe(BaseScraper):
                         break
                 else:
                     no_change_count = 0
-
-                last_job_count = new_job_count
 
             html = driver.page_source
             soup = BeautifulSoup(html, "html.parser")
