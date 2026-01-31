@@ -22,6 +22,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 from sqlmodel import SQLModel
 from app.models import Job  # Import models so they register with SQLModel
+from app.models import Category
 
 target_metadata = SQLModel.metadata
 
