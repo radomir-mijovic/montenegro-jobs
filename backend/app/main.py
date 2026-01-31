@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     # Database schema is managed by Alembic migrations
     # Run: alembic upgrade head
 
-    scrape_all_jobs.delay()
+    #scrape_all_jobs.delay()
     logger.info("Triggering inital scraping")
 
     yield
@@ -41,11 +41,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/")
-async def root():
-    return {"message": "Welcome to Montenegro Jobs API"}
 
 
 @app.get("/api/health")
