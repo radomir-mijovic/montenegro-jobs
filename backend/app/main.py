@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     # Database schema is managed by Alembic migrations
     # Run: alembic upgrade head
 
-    #scrape_all_jobs.delay()
+    scrape_all_jobs.delay()
     logger.info("Triggering inital scraping")
 
     yield
