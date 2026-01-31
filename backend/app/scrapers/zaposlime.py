@@ -70,7 +70,7 @@ class ZaposliMe(BaseScraper):
         )
 
     def last_page_number(self) -> int | None:
-        url = self.BASE_URL + "oglasi-za-posao"
+        url = self.BASE_URL + "/oglasi-za-posao"
         html = self._fetch_page(url)
         if not html:
             return None

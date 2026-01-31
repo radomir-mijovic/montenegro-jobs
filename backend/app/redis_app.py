@@ -9,21 +9,18 @@ REDIS_HOST = os.getenv("REDIS_HOST", "redis")
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
 
 redis = Redis(
-    host=REDIS_HOST,
-    port=6379,
-    password=REDIS_PASSWORD,
-    decode_responses=True
+    host=REDIS_HOST, port=6379, password=REDIS_PASSWORD, decode_responses=True
 )
 
 JOB_CACHE_KEY: str = "list:jobs"
-JOB_CACHE_TTL: int = 300
+JOB_CACHE_TTL: int = 86400
 
 
 def set_jobs_cache(jobs: Sequence[Job]):
     redis.set(
         JOB_CACHE_KEY,
-        json.dumps([job.model_dump(mode='json') for job in jobs]),
-        ex=JOB_CACHE_TTL
+        json.dumps([job.model_dump(mode="json") for job in jobs]),
+        ex=JOB_CACHE_TTL,
     )
 
 
