@@ -43,11 +43,6 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to Montenegro Jobs API"}
-
-
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy"}
