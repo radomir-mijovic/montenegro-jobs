@@ -1,17 +1,19 @@
+import json
 import logging
-import os
 from datetime import date
 
 from app.celery_app import celery_app
 from app.db import SessionLocal
 from app.models import Job
+from app.redis_app import JOB_CACHE_KEY, JOB_CACHE_TTL
+from app.redis_app import redis as redis_app
 from app.scrapers import get_scraper
 from app.scrapers.base import Job as JobCreate
 from app.scrapers.prekoveze import last_page_number as prekoveze_last_page_number
 from app.scrapers.zaposlime import last_page_number as zaposlime_last_page_number
 from celery import chord
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session, select
+from sqlmodel import Session, delete, func, select
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +24,6 @@ SOURCES: dict[str, int | None] = {
     "zzzcg": 55,
     "radnikme": 1,
     "berzarada": 4,
-
 }
 
 
@@ -63,18 +64,51 @@ def scrape_all_jobs():
             scrape_single_source.s(source, max_pages)
             for source, max_pages in SOURCES.items()
         ),
-        cleanup_expired_jobs.s(),
+        (cleanup_expired_jobs.s() | delete_duplicated_jobs.s() | cache_all_jobs.s()),
     )
     return job.apply_async()
 
 
-@celery_app.task(name="app.tasts.cleanup_expired_jobs")
+@celery_app.task(name="app.tasks.cleanup_expired_jobs")
 def cleanup_expired_jobs(results):
     """Runs after all scrapers complete to delete expired jobs"""
     session = SessionLocal()
     try:
         delete_expired_ones_from_database(session)
         logger.info("Cleant up finished")
+    finally:
+        session.close()
+
+
+@celery_app.task(name="app.tasks.delete_duplicated_jobs")
+def delete_duplicated_jobs(results):
+    """Runs just in case if there is any duplicated jobs"""
+    session = SessionLocal()
+    try:
+        query = select(func.min(Job.id)).group_by(Job.url)
+        stmt = delete(Job).where(Job.id.not_in(query))
+        result = session.exec(stmt)
+        session.commit()
+        logger.info(f"Deleted {result.rowcount} duplicated jobs")
+    finally:
+        session.close()
+
+
+@celery_app.task(name="app.tasks.cache_all_jobs")
+def cache_all_jobs(results):
+    """Runs after all jobs to cache all new jobs"""
+    session = SessionLocal()
+    try:
+        redis_app.delete(JOB_CACHE_KEY)
+        logger.info(f"Deleted existing cache for key: {JOB_CACHE_KEY}")
+
+        all_jobs = session.exec(select(Job)).all()
+        redis_app.set(
+            JOB_CACHE_KEY,
+            json.dumps([job.model_dump(mode="json") for job in all_jobs]),
+            ex=JOB_CACHE_TTL,
+        )
+        logger.info(f"Cached {len(all_jobs)} jobs")
     finally:
         session.close()
 
@@ -124,7 +158,7 @@ def get_existing_jobs_url(jobs: list[JobCreate], session) -> dict:
 def delete_expired_ones_from_database(session: Session) -> None:
     query = select(Job).where(
         Job.expires.is_not(None),  # type: ignore
-        Job.expires < date.today()  # type: ignore
+        Job.expires < date.today(),  # type: ignore
     )
     jobs_to_delete = session.exec(query).all()
 
