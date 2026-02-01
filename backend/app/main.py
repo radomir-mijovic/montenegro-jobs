@@ -3,7 +3,11 @@ import os
 from contextlib import asynccontextmanager
 
 from app.routers import pages
-from app.tasks import create_all_categories_in_db, scrape_all_jobs
+from app.tasks import (
+    assign_categories_to_jobs,
+    create_all_categories_in_db,
+    scrape_all_jobs,
+)
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,10 +29,16 @@ async def lifespan(app: FastAPI):
     # Run: alembic upgrade head
 
     if os.environ.get("SCRAPE_ON_INITIAL"):
+        logger.info("Inital scrape started")
         scrape_all_jobs.delay()
 
     if os.environ.get("CREATE_CATEGORIES_ON_INITIAL"):
+        logger.info("Inital category creation started")
         create_all_categories_in_db()
+
+    if os.environ.get("ASSIGN_CATEGORIES_ON_INITIAL"):
+        logger.info("Inital category assign started")
+        assign_categories_to_jobs.delay()
 
     logger.info("Triggering inital scraping")
 
