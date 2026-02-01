@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
 
     if os.environ.get("ASSIGN_CATEGORIES_ON_INITIAL"):
         logger.info("Inital category assign started")
-        assign_categories_to_jobs.delay()
+        assign_categories_to_jobs()
 
     logger.info("Triggering inital scraping")
 
