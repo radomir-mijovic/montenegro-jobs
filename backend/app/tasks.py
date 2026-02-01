@@ -120,8 +120,8 @@ def cache_all_jobs(results):
         session.close()
 
 
-@celery_app.task(name="app.tasks.assign_categories_to_jobs")
-def assign_categories_to_jobs(results):
+#@celery_app.task(name="app.tasks.assign_categories_to_jobs")
+def assign_categories_to_jobs():
     session = SessionLocal()
 
     try:
