@@ -1,3 +1,3 @@
-from app.models.job import Job
+from app.models.job import Job, Category
 
-__all__ = ["Job"]
+__all__ = ["Job", "Category"]

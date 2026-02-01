@@ -5906,7 +5906,7 @@ Main Header
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 60px;
+  padding: 0 30px;
   max-width: 1920px;
   margin: 0 auto;
 }

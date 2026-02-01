@@ -2,6 +2,7 @@ from app.db import get_session
 from app.models.job import Job
 from app.routers.utils import (
     get_cached_jobs,
+    get_categories,
     get_featured_cities,
     get_featured_jobs,
     get_queried_jobs,
@@ -27,6 +28,7 @@ def root(request: Request, session: Session = Depends(get_session)):
     ).all()
 
     cities = get_featured_cities(session=session)
+    categories = get_categories(session=session)
     featured_jobs = get_featured_jobs(session=session)
     total = session.exec(select(func.count()).select_from(Job)).one()
 
@@ -35,6 +37,7 @@ def root(request: Request, session: Session = Depends(get_session)):
         "total": total,
         "cities": cities,
         "featured_jobs": featured_jobs,
+        "categories": categories,
     }
     return templates.TemplateResponse(
         request=request, name="index.html", context=context
@@ -48,9 +51,12 @@ def job_search(
     limit: int = 99999,
     title: str | None = None,
     city: str | None = None,
+    category: str | None = None,
 ):
-    if title == "" and city == "":
+    if not title and not city and not category:
         jobs = get_cached_jobs(session=session)
+    elif category and not title and not city:
+        jobs = get_queried_jobs(category=category, limit=limit, session=session)
     else:
         jobs = get_queried_jobs(title=title, city=city, limit=limit, session=session)
 

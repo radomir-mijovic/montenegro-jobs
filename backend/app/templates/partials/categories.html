@@ -1,0 +1,21 @@
+<section class="job-categories">
+  <div class="auto-container">
+    <div class="sec-title text-center">
+      <h2>Popularne Kategorije</h2>
+    </div>
+
+    <div class="row wow fadeInUp">
+      {% for category in categories %}
+      <div class="category-block col-lg-4 col-md-6 col-sm-12">
+        <div class="inner-box">
+          <div class="content">
+              <span class="icon flaticon-{{category.icon}}"></span>
+            <h4><a href="/job-search?category={{category.name}}">{{category.name}}</a></h4>
+            <p>{{category.count}}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
