@@ -1,15 +1,16 @@
-from app.models.job import Job
+from app.models.job import Category, CategoryJobLink, Job
 from app.redis_app import get_jobs_cache, set_jobs_cache
 from app.scrapers.base import Job as JobBase
-from sqlalchemy import text
+from sqlalchemy import ScalarResult, text
 from sqlalchemy.sql import func
 from sqlmodel import Session, select
 
 
 def get_queried_jobs(
     *,
-    title: str | None,
-    city: str | None,
+    title: str | None = None,
+    city: str | None = None,
+    category: str | None = None,
     limit: int,
     offset: int | None = None,
     session: Session,
@@ -81,6 +82,15 @@ def get_queried_jobs(
     elif city:
         query = query.where(Job.location.ilike(f"%{city}%"))
         jobs = session.exec(query.offset(offset).limit(fetch_limit)).all()
+
+    elif category:
+        query = (
+            select(Job)
+            .join(CategoryJobLink)
+            .join(Category)
+            .where(Category.name.ilike(f"%{category}"))
+        )
+        jobs = session.exec(query).all()
 
     else:
         jobs = session.exec(query.offset(offset).limit(fetch_limit)).all()
@@ -156,3 +166,51 @@ def get_cached_jobs(session: Session):
     set_jobs_cache(pydantic_jobs)
 
     return pydantic_jobs
+
+
+def get_jobs_count_based_on_category(name: str, session: Session) -> int:
+    query = (
+        select(func.count(Job.id))
+        .join(CategoryJobLink)
+        .join(Category)
+        .where(Category.name == name)
+    )
+    return session.exec(query).one()
+
+
+def get_category_name(name: str, session: Session) -> str | None:
+    category_name = session.exec(
+        select(Category).where(Category.name.ilike(f"%{name}%"))
+    ).first()
+    if category_name:
+        return category_name.name
+
+    return None
+
+
+def get_categories(session: Session) -> list[dict]:
+    categories_to_display: dict[str, str] = {
+        "Ugostiteljstvo I Turizam": "tree-of-love",
+        "Prodaja I Maloprodaja": "home",
+        "Vožnja, Transport I Logistika": "car",
+        "Obrazovanje": "notebook",
+        "Zdravstvo I Medicina": "first-aid-kit-1",
+        "Usluge I Zanatstvo": "maintenance",
+        "Korisnička podrška": "support",
+        "Proizvodnja I Industrija": "production",
+        "Menadžment I Liderstvo": "handshake",
+    }
+    categories: list[dict] = []
+
+    for name, icon in categories_to_display.items():
+        cat_dict: dict = {}
+        category_name = get_category_name(name, session=session)
+        jobs_count = get_jobs_count_based_on_category(name, session=session)
+
+        cat_dict["name"] = category_name
+        cat_dict["count"] = jobs_count
+        cat_dict["icon"] = icon
+
+        categories.append(cat_dict)
+
+    return categories

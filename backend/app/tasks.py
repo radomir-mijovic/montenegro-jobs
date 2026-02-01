@@ -5,6 +5,8 @@ from datetime import date
 from app.celery_app import celery_app
 from app.db import SessionLocal
 from app.models import Job
+from app.models.job import Category
+from app.models.utils import CATEGORY_KEYWORDS
 from app.redis_app import JOB_CACHE_KEY, JOB_CACHE_TTL
 from app.redis_app import redis as redis_app
 from app.scrapers import get_scraper
@@ -64,7 +66,12 @@ def scrape_all_jobs():
             scrape_single_source.s(source, max_pages)
             for source, max_pages in SOURCES.items()
         ),
-        (cleanup_expired_jobs.s() | delete_duplicated_jobs.s() | cache_all_jobs.s()),
+        (
+            cleanup_expired_jobs.s()
+            | delete_duplicated_jobs.s()
+            | cache_all_jobs.s()
+            | assign_categories_to_jobs.s()
+        ),
     )
     return job.apply_async()
 
@@ -109,6 +116,43 @@ def cache_all_jobs(results):
             ex=JOB_CACHE_TTL,
         )
         logger.info(f"Cached {len(all_jobs)} jobs")
+    finally:
+        session.close()
+
+
+@celery_app.task(name="app.tasks.assign_categories_to_jobs")
+def assign_categories_to_jobs():
+    session = SessionLocal()
+
+    try:
+        categories = session.exec(select(Category)).all()
+        category_map: dict = {cat.name: cat for cat in categories}
+
+        jobs = session.exec(select(Job)).all()
+
+        for job in jobs:
+            job_title_lower: str = job.title.lower()
+            matched_categories: list = []
+
+            for category_name, keywords in CATEGORY_KEYWORDS.items():
+                for keyword in keywords:
+                    if keyword.lower() in job_title_lower:
+                        if category_name in category_map:
+                            category = category_map[category_name]
+
+                            if category not in matched_categories:
+                                matched_categories.append(category)
+                        break
+
+            if matched_categories:
+                job.categories = matched_categories
+                session.add(job)
+
+        session.commit()
+
+    except Exception as e:
+        logger.warning(f"Error while assigning category: {e}")
+
     finally:
         session.close()
 
@@ -171,3 +215,22 @@ def delete_expired_ones_from_database(session: Session) -> None:
         logger.info(f"Deleted {len(jobs_to_delete)} expired jobs")
     else:
         logger.info("No expired jobs to delete")
+
+
+def create_all_categories_in_db():
+    session = SessionLocal()
+
+    try:
+        for key in CATEGORY_KEYWORDS.keys():
+            query = select(Category).where(Category.name == key)
+            if session.exec(query).first():
+                continue
+            else:
+                category = Category(name=key)
+                session.add(category)
+                session.commit()
+    except Exception as e:
+        logger.warning(f"Error on creating category: {e}")
+
+    finally:
+        session.close()

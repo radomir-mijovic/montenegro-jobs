@@ -3,7 +3,7 @@ from app.models.job import Category
 from sqlmodel import Session
 
 CATEGORY_KEYWORDS = {
-    "Ugostiteljstvo & Turizam": [
+    "Ugostiteljstvo I Turizam": [
         "konobar",
         "sobar",
         "barmen",
@@ -29,7 +29,7 @@ CATEGORY_KEYWORDS = {
         "pomoćni kuvar",
         "šef kuhinje",
     ],
-    "Prodaja & Maloprodaja": [
+    "Prodaja I Maloprodaja": [
         "prodavac",
         "prodaj",
         "sales",
@@ -47,7 +47,7 @@ CATEGORY_KEYWORDS = {
         "cashier",
         "blagajnik",
     ],
-    "Vožnja, Transport & Logistika": [
+    "Vožnja, Transport I Logistika": [
         "vozač",
         "driver",
         "vož",
@@ -65,7 +65,7 @@ CATEGORY_KEYWORDS = {
         "dispatcher",
         "kurirsk",
     ],
-    "Administracija & Uredski poslovi": [
+    "Administracija I Uredski poslovi": [
         "referent",
         "administrativ",
         "office",
@@ -82,7 +82,7 @@ CATEGORY_KEYWORDS = {
         "kancelarij",
         "protocol",
     ],
-    "Finansije & Računovodstvo": [
+    "Finansije I Računovodstvo": [
         "računovođa",
         "računovodstv",
         "accountant",
@@ -113,7 +113,7 @@ CATEGORY_KEYWORDS = {
         "pedagog",
         "obrazovan",
     ],
-    "Zdravstvo & Medicina": [
+    "Zdravstvo I Medicina": [
         "doktor",
         "ljekař",
         "medicin",
@@ -130,7 +130,7 @@ CATEGORY_KEYWORDS = {
         "dental",
         "hirurg",
     ],
-    "Građevina & Inženjerstvo": [
+    "Građevina I Inženjerstvo": [
         "građevin",
         "inženjer",
         "engineer",
@@ -150,7 +150,7 @@ CATEGORY_KEYWORDS = {
         "zavariv",
         "welder",
     ],
-    "Menadžment & Liderstvo": [
+    "Menadžment I Liderstvo": [
         "direktor",
         "manager",
         "menadžer",
@@ -166,7 +166,7 @@ CATEGORY_KEYWORDS = {
         "voditelj",
         "chief",
     ],
-    "HR & Ljudski resursi": [
+    "HR I Ljudski resursi": [
         "hr",
         "human resources",
         "kadrov",
@@ -178,7 +178,7 @@ CATEGORY_KEYWORDS = {
         "zapošljavanj",
         "personalni",
     ],
-    "Marketing & Komunikacije": [
+    "Marketing I Komunikacije": [
         "marketing",
         "pr",
         "komunikacij",
@@ -194,7 +194,7 @@ CATEGORY_KEYWORDS = {
         "seo",
         "medij",
     ],
-    "IT & Tehnologija": [
+    "IT I Tehnologija": [
         "developer",
         "programmer",
         "software",
@@ -227,7 +227,7 @@ CATEGORY_KEYWORDS = {
         "paralegal",
         "sud",
     ],
-    "Proizvodnja & Industrija": [
+    "Proizvodnja I Industrija": [
         "proizvod",
         "radnik",
         "operator",
@@ -242,7 +242,7 @@ CATEGORY_KEYWORDS = {
         "industrijski",
         "tehnolog",
     ],
-    "Usluge & Zanatstvo": [
+    "Usluge I Zanatstvo": [
         "frizer",
         "frizersk",
         "beauty",

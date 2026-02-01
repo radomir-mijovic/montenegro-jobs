@@ -1,8 +1,10 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from app.routers import pages
-from app.tasks import scrape_all_jobs
+from app.tasks import create_all_categories_in_db, scrape_all_jobs
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -13,6 +15,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+load_dotenv()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,7 +24,12 @@ async def lifespan(app: FastAPI):
     # Database schema is managed by Alembic migrations
     # Run: alembic upgrade head
 
-    #scrape_all_jobs.delay()
+    if os.environ.get("SCRAPE_ON_INITIAL"):
+        scrape_all_jobs.delay()
+
+    if os.environ.get("CREATE_CATEGORIES_ON_INITIAL"):
+        create_all_categories_in_db()
+
     logger.info("Triggering inital scraping")
 
     yield
@@ -41,6 +50,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to Montenegro Jobs API"}
 
 
 @app.get("/api/health")
