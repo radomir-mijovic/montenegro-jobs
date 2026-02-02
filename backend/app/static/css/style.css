@@ -5906,7 +5906,7 @@ Main Header
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 30px;
+  padding: 0 15px;
   max-width: 1920px;
   margin: 0 auto;
 }
@@ -5926,9 +5926,10 @@ Main Header
 .main-header .logo {
   position: relative;
   z-index: 9;
-  padding: 25px 0;
+  padding: 10px 0;
   margin-right: 100px;
   transition: all 300ms ease;
+  width: 150px;
 }
 
 .main-header .menu-box {
