@@ -14,6 +14,7 @@ from app.scrapers.base import Job as JobCreate
 from app.scrapers.prekoveze import last_page_number as prekoveze_last_page_number
 from app.scrapers.zaposlime import last_page_number as zaposlime_last_page_number
 from celery import chord
+from celery.exceptions import SoftTimeLimitExceeded
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, delete, func, select
 
@@ -29,7 +30,13 @@ SOURCES: dict[str, int | None] = {
 }
 
 
-@celery_app.task(name="app.tasks.scrape_single_source", bind=True, max_retries=3)
+@celery_app.task(
+    name="app.tasks.scrape_single_source",
+    bind=True,
+    max_retries=3,
+    soft_time_limit=1700,
+    time_limit=1800,
+)
 def scrape_single_source(self, source: str, max_pages: int):
     """Scrape a single job source"""
     logger.info(f"Starting scraping job for {source}")
@@ -51,7 +58,15 @@ def scrape_single_source(self, source: str, max_pages: int):
                 "jobs_count": len(jobs) if jobs else 0,
                 "status": "success",
             }
-        except Exception as e:
+
+        except SoftTimeLimitExceeded:
+            logger.warning(f"Soft timeout while scraping {source}")
+            return {
+                "source": source,
+                "jobs_count": 0,
+                "status": "timeout",
+            }
+        except (TimeoutError, ConnectionError) as e:
             logger.error(f"Error while scpaing {source}: {e}")
             raise self.retry(exc=e, countdown=300)
     finally:
