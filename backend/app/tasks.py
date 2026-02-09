@@ -34,8 +34,8 @@ SOURCES: dict[str, int | None] = {
     name="app.tasks.scrape_single_source",
     bind=True,
     max_retries=3,
-    soft_time_limit=3000,
-    time_limit=3300,
+    soft_time_limit=6000,
+    time_limit=6300,
 )
 def scrape_single_source(self, source: str, max_pages: int):
     """Scrape a single job source"""
@@ -97,7 +97,7 @@ def cleanup_expired_jobs(results):
     session = SessionLocal()
     try:
         delete_expired_ones_from_database(session)
-        logger.info("Cleant up finished")
+        logger.info("Cleanup finished")
     finally:
         session.close()
 

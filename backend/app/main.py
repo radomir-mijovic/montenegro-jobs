@@ -36,8 +36,6 @@ async def lifespan(app: FastAPI):
         logger.info("Inital category assign started")
         # assign_categories_to_jobs()
 
-    logger.info("Triggering inital scraping")
-
     yield
     logger.info("Shutting down application...")
 
