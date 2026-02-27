@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from app.scrapers.utils import convert_date, extract_image_text
+from app.scrapers.utils import convert_date
 from bs4 import BeautifulSoup
 
 from .base import BaseScraper, Job
