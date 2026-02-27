@@ -37,6 +37,9 @@ class BerzaRada(BaseScraper):
         company_elem = card.find("div", class_="job-company").find_next("p")
         company = company_elem.get_text(strip=True)
 
+        description_elem = card.find("div", class_="job-content").find_next("p")
+        description = description_elem.get_text(strip=True)
+
         url = card["href"]
 
         img = card.find("img")["src"]
@@ -59,4 +62,5 @@ class BerzaRada(BaseScraper):
             expires=expires_date_object,
             source="berzarada.me",
             img=img,
+            description=description,
         )

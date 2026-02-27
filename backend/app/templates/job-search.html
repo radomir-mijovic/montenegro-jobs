@@ -22,9 +22,10 @@
       "item": {
         "@type": "JobPosting",
         "title": "{{ job.title }}",
-        "description": "{{ job.title }} - {{ job.company }}",
-        "datePosted": "{{ job.created_at.isoformat() if job.created_at else '' }}",
+        "description": "{{ job.description if job.description else '' }}",
+        "datePosted": "{{ job.date_posted.isoformat() if job.date_posted else '' }}",
         "validThrough": "{{ job.expires if job.expires else '' }}",
+        "baseSalary": "1000",
         "employmentType": "FULL_TIME",
         "hiringOrganization": {
           "@type": "Organization",
@@ -35,7 +36,10 @@
           "address": {
             "@type": "PostalAddress",
             "addressLocality": "{{ job.location }}",
-            "addressCountry": "ME"
+            "addressCountry": "ME",
+            "streetAddress": "{{ job.location }}",
+            "addressRegion": "Crna Gora",
+            "postalCode": "81000"
           }
         },
         "url": "{{ job.url }}"

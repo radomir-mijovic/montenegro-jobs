@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from app.scrapers.utils import convert_date
+from app.scrapers.utils import convert_date, extract_image_text
 from bs4 import BeautifulSoup
 
 from .base import BaseScraper, Job
@@ -54,6 +54,26 @@ class PrekoVeze(BaseScraper):
         expires_str = expires.replace("Važi do: ", "")
         expires_date_object = convert_date(expires_str, source="prekoveze")
 
+        detail_html = self.session.get(url, timeout=10).text
+        detail_soup = BeautifulSoup(detail_html, "html.parser")
+
+        if description_div := detail_soup.find("div", id="job_view_text"):
+            text_parts: list = []
+
+            #if img_url := description_div.find("img"):
+            #    if img_text := extract_image_text(img_url["src"]):
+            #        print(img_text, "image text")
+
+            for span in description_div.find_all("span"):
+                if text := span.get_text(strip=True):
+                    text_parts.append(text)
+
+            for strong in description_div.find_all("strong"):
+                if text := strong.get_text(strip=True):
+                    text_parts.append(text)
+
+            description: str = " ".join(text_parts)
+
         return Job(
             title=title,
             company=company,
@@ -63,6 +83,7 @@ class PrekoVeze(BaseScraper):
             expires=expires_date_object,
             source="prekoveze.me",
             img=img,
+            description=description,
         )
 
     def last_page_number(self) -> int | None:

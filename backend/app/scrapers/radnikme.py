@@ -125,6 +125,20 @@ class RadnikMe(BaseScraper):
         detail_html = self.session.get(url, timeout=10).text
         detail_soup = BeautifulSoup(detail_html, "html.parser")
 
+        if description_div := detail_soup.find("article", class_="job-content-text"):
+            text_parts: list = []
+
+            for p in description_div.find_all("p"):
+                if text := p.get_text(strip=True):
+                    text_parts.append(text)
+
+            for strong in description_div.find_all("strong"):
+                if text := strong.get_text(strip=True):
+                    text_parts.append(text)
+
+            description: str = " ".join(text_parts)
+            print(description, "description")
+
         expires_elem = detail_soup.find(string=lambda t: "Oglas je aktivan do" in t)
         expires = expires_elem.find_next("b").get_text(strip=True)
         expires_date_object = convert_date(expires)
@@ -138,4 +152,5 @@ class RadnikMe(BaseScraper):
             expires=expires_date_object,
             source="radnik.me",
             img=img,
+            description=description,
         )

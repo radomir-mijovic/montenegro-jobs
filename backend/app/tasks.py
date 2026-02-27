@@ -34,8 +34,8 @@ SOURCES: dict[str, int | None] = {
     name="app.tasks.scrape_single_source",
     bind=True,
     max_retries=3,
-    soft_time_limit=6000,
-    time_limit=6300,
+    soft_time_limit=7000,
+    time_limit=7300,
 )
 def scrape_single_source(self, source: str, max_pages: int):
     """Scrape a single job source"""

@@ -33,3 +33,4 @@ class Job(SQLModel, table=True):
     categories: list["Category"] = Relationship(
         back_populates="jobs", link_model=CategoryJobLink
     )
+    description: str | None = Field(default_factory=None)

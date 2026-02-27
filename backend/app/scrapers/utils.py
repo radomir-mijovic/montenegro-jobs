@@ -1,6 +1,9 @@
 import logging
 from datetime import date, datetime
 
+#import pytesseract
+#from PIL import Image
+
 logger = logging.getLogger(__name__)
 
 MONTHS_TO_MAP: dict[str, str] = {
@@ -70,18 +73,24 @@ def convert_date(
                     # Format: "13. februara" (day and month only, no year)
                     day, month_name = parts
                     # Try both nominative and genitive forms
-                    month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
+                    month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(
+                        month_name
+                    )
 
                     if not month:
                         raise ValueError(f"Unknown month: {month_name}")
 
                     # Assume current year
                     current_year = datetime.now().year
-                    parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year}", "%d.%m.%Y").date()
+                    parsed_date = datetime.strptime(
+                        f"{day.zfill(2)}.{month}.{current_year}", "%d.%m.%Y"
+                    ).date()
 
                     # If the date has already passed this year, assume next year
                     if parsed_date < date.today():
-                        parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year + 1}", "%d.%m.%Y").date()
+                        parsed_date = datetime.strptime(
+                            f"{day.zfill(2)}.{month}.{current_year + 1}", "%d.%m.%Y"
+                        ).date()
 
                     return parsed_date
 
@@ -89,7 +98,9 @@ def convert_date(
                     # Format: "23. januar 2026"
                     day, month_name, year = parts
                     # Try both nominative and genitive forms
-                    month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
+                    month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(
+                        month_name
+                    )
 
                     if not month:
                         raise ValueError(f"Unknown month: {month_name}")
@@ -106,18 +117,24 @@ def convert_date(
                 # Format: "11 februar" (no year)
                 day, month_name = parts
                 # Try both nominative and genitive forms
-                month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
+                month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(
+                    month_name
+                )
 
                 if not month:
                     raise ValueError(f"Unknown month: {month_name}")
 
                 # Assume current year
                 current_year = datetime.now().year
-                parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year}", "%d.%m.%Y").date()
+                parsed_date = datetime.strptime(
+                    f"{day.zfill(2)}.{month}.{current_year}", "%d.%m.%Y"
+                ).date()
 
                 # If the date has already passed this year, assume next year
                 if parsed_date < date.today():
-                    parsed_date = datetime.strptime(f"{day.zfill(2)}.{month}.{current_year + 1}", "%d.%m.%Y").date()
+                    parsed_date = datetime.strptime(
+                        f"{day.zfill(2)}.{month}.{current_year + 1}", "%d.%m.%Y"
+                    ).date()
 
                 return parsed_date
 
@@ -125,7 +142,9 @@ def convert_date(
                 # Format: "14 januar 2026"
                 day, month_name, year = parts
                 # Try both nominative and genitive forms
-                month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(month_name)
+                month = MONTHS_TO_MAP.get(month_name) or MONTHS_GENITIVE_TO_MAP.get(
+                    month_name
+                )
 
                 if not month:
                     raise ValueError(f"Unknown month: {month_name}")
@@ -137,3 +156,20 @@ def convert_date(
     except Exception as e:
         logger.warning(f"Unable to format date for {source} for {date_source}: {e}")
         return None
+
+
+#def extract_image_text(url: str | None) -> str | None:
+#    """Function that extract text from image
+#    Args:
+#        url(str)
+#    Returns:
+#        str
+#    """
+#    try:
+#        img = Image.open(url)
+#        text = pytesseract.image_to_string(img)
+#        return text
+#    except Exception as e:
+#        print(e)
+#        logger.info(e)
+#        return None

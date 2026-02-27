@@ -58,6 +58,23 @@ class ZaposliMe(BaseScraper):
         expires = expires_elem.get_text(strip=True) if expires_elem else "N/A"
         expires_date_object = convert_date(expires)
 
+        if description_div := detail_soup.find("div", id="description"):
+            text_parts: list = []
+
+            for span in description_div.find_all("span"):
+                if text := span.get_text(strip=True):
+                    text_parts.append(text)
+
+            for li in description_div.find_all("li"):
+                if text := li.get_text(strip=True):
+                    text_parts.append(text)
+
+            for strong in description_div.find_all("strong"):
+                if text := strong.get_text(strip=True):
+                    text_parts.append(text)
+
+            description: str = " ".join(text_parts)
+
         return Job(
             title=title,
             company=company,
@@ -67,6 +84,7 @@ class ZaposliMe(BaseScraper):
             expires=expires_date_object,
             source="zaposli.me",
             img=img,
+            description=description,
         )
 
     def last_page_number(self) -> int | None:

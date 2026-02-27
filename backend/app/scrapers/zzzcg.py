@@ -54,6 +54,21 @@ class ZzzCg(BaseScraper):
         detail_html = self.session.get(url, timeout=10).text
         detail_soup = BeautifulSoup(detail_html, "html.parser")
 
+        text_parts: list = []
+        if desc_text_1 := detail_soup.find("div", class_="elementor-element-36daa85"):
+            if text := desc_text_1.get_text(strip=True):
+                text_parts.append(text)
+
+        if desc_text_2 := detail_soup.find("div", class_="elementor-element-a9bb732"):
+            if text := desc_text_2.get_text(strip=True):
+                text_parts.append(text)
+
+        if desc_text_3 := detail_soup.find("div", class_="elementor-element-d32f17e"):
+            if text := desc_text_3.get_text(strip=True):
+                text_parts.append(text)
+
+        description: str = " ".join(text_parts)
+
         expires_elem = detail_soup.select_one("div.rokzaprijavu")
         expires = expires_elem.get_text(strip=True) if expires_elem else "N/A"
         expires_str = expires.replace("Važi do:", "")
@@ -74,4 +89,5 @@ class ZzzCg(BaseScraper):
             expires=expires_date_object,
             source="zzzcg.me",
             img="",
+            description=description,
         )
