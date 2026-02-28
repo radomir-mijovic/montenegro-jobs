@@ -137,7 +137,6 @@ class RadnikMe(BaseScraper):
                     text_parts.append(text)
 
             description: str = " ".join(text_parts)
-            print(description, "description")
 
         expires_elem = detail_soup.find(string=lambda t: "Oglas je aktivan do" in t)
         expires = expires_elem.find_next("b").get_text(strip=True)

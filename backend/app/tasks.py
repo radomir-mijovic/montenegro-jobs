@@ -194,6 +194,7 @@ def save_jobs(jobs: list[JobCreate], existing_by_url: dict, session: Session) ->
 
         if existing.expires != job_data.expires:
             existing.expires = job_data.expires
+            existing.description = job_data.description
             is_updated = True
 
         if is_updated:
