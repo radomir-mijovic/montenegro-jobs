@@ -20,7 +20,7 @@ class Job(BaseModel):
     date_posted: date | None
     expires: date | None
     img: str
-    description: str | None = None
+    description: str | None
 
     model_config = {"from_attributes": True}
 
