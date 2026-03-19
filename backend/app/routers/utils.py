@@ -1,7 +1,7 @@
 from app.models.job import Category, CategoryJobLink, Job
 from app.redis_app import get_jobs_cache, set_jobs_cache
 from app.scrapers.base import Job as JobBase
-from sqlalchemy import ScalarResult, text
+from sqlalchemy import text
 from sqlalchemy.sql import func
 from sqlmodel import Session, select
 
@@ -212,5 +212,7 @@ def get_categories(session: Session) -> list[dict]:
         cat_dict["icon"] = icon
 
         categories.append(cat_dict)
+
+    print(categories, "categories")
 
     return categories

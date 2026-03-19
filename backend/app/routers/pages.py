@@ -44,7 +44,7 @@ def root(request: Request, session: Session = Depends(get_session)):
     )
 
 
-@router.get("/job-search", response_class=HTMLResponse)
+@router.get("/poslovi", response_class=HTMLResponse)
 def job_search(
     request: Request,
     session: Session = Depends(get_session),
@@ -85,7 +85,7 @@ def job_query(
     session: Session = Depends(get_session),
 ):
     if request.headers.get("HX-Request") != "true":
-        return RedirectResponse("/job-search", status_code=303)
+        return RedirectResponse("/poslovi", status_code=303)
 
     if title == "" and city == "":
         jobs = get_cached_jobs(session=session)
@@ -128,7 +128,7 @@ def sitemap(session: Session = Depends(get_session)):
     # Job search page
     urls.append(f"""
     <url>
-        <loc>{base_url}/job-search</loc>
+        <loc>{base_url}/poslovi</loc>
         <lastmod>{today}</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
@@ -140,7 +140,7 @@ def sitemap(session: Session = Depends(get_session)):
             city_clean = city.strip()
             urls.append(f"""
     <url>
-        <loc>{base_url}/job-search?city={city_clean}</loc>
+        <loc>{base_url}/poslovi?city={city_clean}</loc>
         <lastmod>{today}</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
